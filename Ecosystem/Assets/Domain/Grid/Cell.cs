@@ -15,17 +15,21 @@ namespace GridDomain
 
 
         // #### [++] Constructor [++] ####
-        public Cell(Vector2Int newCoordinates, int cellSize)
+        public Cell(Vector2Int newCoordinates, float cellSize)
         {
             if (newCoordinates == null)
             {
                 throw new System.Exception("<Cell> Cannot set null (Vector2Int)coordinates.");
             }
             this._coordinates = newCoordinates;
-            this._cellObject = (GameObject) new GameObject("Cell " + this._coordinates);
+            setObject();
 
             // set cell in the corresponding grid position
             this._cellObject.transform.localPosition = getWorldPosition(this._coordinates.x, this._coordinates.y, cellSize);
+        }
+        private void setObject()
+        {
+            this._cellObject = (GameObject) new GameObject("Cell " + this._coordinates);
         }
         // #### [--] Constructor [--] ####
 
@@ -60,11 +64,18 @@ namespace GridDomain
             this._tile.getObject().transform.localPosition = new Vector3(0, 0, 0); // reset tile object position relative to parent
         }
         // ---- [--] Tile [--] ---- 
+
+        // ---- [++] Cell Object[++] ---- 
+        public GameObject getObject()
+        {
+            return this._cellObject;
+        }
+        // ---- [--] Cell Object [--] ---- 
         // #### [--] Getters & Setters [--] ####
 
 
         // #### [++] Utils [++] #### 
-        private Vector3 getWorldPosition(int x, int y, int cellSize)
+        private Vector3 getWorldPosition(int x, int y, float cellSize)
         {
             return new Vector3(x, y) * cellSize;
         }

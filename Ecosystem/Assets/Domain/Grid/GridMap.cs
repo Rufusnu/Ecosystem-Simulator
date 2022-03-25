@@ -6,8 +6,9 @@ namespace GridDomain
 {
     public class GridMap
     {
-        // #### [++] Attributes [++] #### 
-        private int _cellSize;
+        // #### [++] Attributes [++] ####
+        private GameObject _gridObject = null; 
+        private float _cellSize;
         private int _cols;
         private int _rows;
         private Cell[,] gridArray;
@@ -15,24 +16,25 @@ namespace GridDomain
 
 
         // #### [++] Constructor [++] ####
-        public GridMap(int rows, int cols, int cellSize)
+        public GridMap(int rows, int cols, float cellSize)
         {
+            this._gridObject = new GameObject("Grid");
             setRowsNumber(rows);
             setColsNumber(cols);
             setCellSize(cellSize);
-            gridArray = new Cell[rows, cols];
+            gridArray = new Cell[cols, rows];
             
             // create a <Cell> and <Tile> pointing to null to change its value for constructing the array 
             Cell cell = null;
             Tile tile = null;
 
-            for (int row = 0; row < gridArray.GetLength(0); row++)
+            for (int col = 0; col < gridArray.GetLength(0); col++)
             {
-                for (int col = 0; col < gridArray.GetLength(1); col++)
+                for (int row = 0; row < gridArray.GetLength(1); row++)
                 {
                     try {
                         // creating coordinates for the <Cell> and assigning it to the corresponding array position
-                        Vector2Int coordinates = new Vector2Int(row, col);
+                        Vector2Int coordinates = new Vector2Int(col, row);
 
                         // creating tile to insert into cell; setting its sprite from the Asset Service Class
                         tile = new Tile(GridTileSet_AssetService.instance.tile_default);
@@ -40,7 +42,8 @@ namespace GridDomain
                         
                         cell = (Cell) new Cell(coordinates, this._cellSize);
                         cell.setTile(tile);
-                        gridArray[row, col] = cell;
+                        cell.getObject().transform.SetParent(this._gridObject.transform); // needs to be replaced by a set parent function between objects to be simpler
+                        gridArray[col, row] = cell;
                     } catch (System.Exception exception) {
                         throw new System.Exception("<GridMap> ->" + exception);
                     }
@@ -52,11 +55,11 @@ namespace GridDomain
 
         // #### [++] Getters & Setters [++] #### 
         // ---- [++] Cell Size [++] ----
-        public int getCellSize()
+        public float getCellSize()
         {
             return this._cellSize;
         }
-        private void setCellSize(int newCellSize)
+        private void setCellSize(float newCellSize)
         {
             if (newCellSize < 0.1f)
             {
@@ -76,7 +79,7 @@ namespace GridDomain
         {
             if (newRows < 8)
             {
-                throw new System.Exception("<GridMap> Cannot set height/width with a value less than 8");
+                throw new System.Exception("<GridMap> Cannot set height/width with a value less than 8.");
             }
             this._rows = newRows;
         }
@@ -91,11 +94,22 @@ namespace GridDomain
         {
             if (newCols < 8)
             {
-                throw new System.Exception("<GridMap> Cannot set height/width with a value less than 8");
+                throw new System.Exception("<GridMap> Cannot set height/width with a value less than 8.");
             }
             this._cols = newCols;
         }
         // ---- [--] Cols [--] ----
-        // #### [--] Getters & Setters [--] #### 
+        // #### [--] Getters & Setters [--] ####
+
+        // ---- [++] Change Grid Position [++] ----
+        public void positionTo(Vector3 newPosition)
+        {
+            if (newPosition == null)
+            {
+                throw new System.Exception("<GridMap> Cannot set null position.");
+            }
+            this._gridObject.transform.position = newPosition;
+        }
+        // ---- [++] Change Grid Position [++] ----
     }
 }
