@@ -15,12 +15,9 @@ namespace GridDomain
         // #### [++] Constructor [++] ####
         public Tile(Sprite newSprite)
         {
-            if (newSprite == null)
-            {
-                throw new System.Exception("<Tile>: Cannot set null sprite");
-            }
             this._tileObject = (GameObject) new GameObject();
             this._tileObjectSpriteRederer = this._tileObject.AddComponent<SpriteRenderer>();
+            setSprite(newSprite);
         }
         // #### [--]] Constructor [--] ####
 
@@ -42,7 +39,7 @@ namespace GridDomain
         // ---- [--] Sprite [--] ---- 
 
         // ---- [++] Tile Object[++] ---- 
-        public void setTileObject(GameObject newTileObject)
+        public void setObject(GameObject newTileObject)
         {
             if (newTileObject == null)
             {
@@ -50,14 +47,14 @@ namespace GridDomain
             }
             this._tileObject = newTileObject;
         }
-        public GameObject getTileObject()
+        public GameObject getObject()
         {
             return this._tileObject;
         }
         // ---- [--] Tile Object [--] ---- 
 
         // ---- [++] Tile Object Name [++] ---- 
-        public void setTileObjectName(string newName)
+        public void setObjectName(string newName)
         {
             if (newName == null)
             {
@@ -65,7 +62,7 @@ namespace GridDomain
             }
             this._tileObject.name = newName;
         }
-        public string getTileObjectName()
+        public string getObjectName()
         {
             return this._tileObject.name;
         }

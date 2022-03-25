@@ -56,10 +56,12 @@ namespace GridDomain
             this._tile = newTile;
 
             // make the new Tile object child of this Cell object
-            this._tile.getTileObject().transform.SetParent(this._cellObject.transform);
+            this._tile.getObject().transform.SetParent(this._cellObject.transform);
+            this._tile.getObject().transform.localPosition = new Vector3(0, 0, 0); // reset tile object position relative to parent
         }
         // ---- [--] Tile [--] ---- 
         // #### [--] Getters & Setters [--] ####
+
 
         // #### [++] Utils [++] #### 
         private Vector3 getWorldPosition(int x, int y, int cellSize)

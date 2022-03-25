@@ -36,7 +36,7 @@ namespace GridDomain
 
                         // creating tile to insert into cell; setting its sprite from the Asset Service Class
                         tile = new Tile(GridTileSet_AssetService.instance.tile_default);
-                        tile.setTileObjectName("Tile " + coordinates + "");
+                        tile.setObjectName("Tile " + coordinates + "");
                         
                         cell = (Cell) new Cell(coordinates, this._cellSize);
                         cell.setTile(tile);

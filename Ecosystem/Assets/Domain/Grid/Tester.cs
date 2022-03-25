@@ -6,11 +6,14 @@ using GridDomain;
 
 public class Tester : MonoBehaviour
 {
+    public int rows = 8;
+    public int columns = 8;
+    public int cellSize = 5;
     // Start is called before the first frame update
     void Start()
     {
         try {
-            GridMap grid = new GridMap(10, 20, 10);
+            GridMap grid = new GridMap(rows, columns, cellSize);
         } catch (System.Exception exception) {
             Debug.Log("Error: " + exception);
         }
