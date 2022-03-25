@@ -9,6 +9,10 @@ public class Tester : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GridMap grid = new GridMap(10, 20, 1f);
+        try {
+            GridMap grid = new GridMap(10, 20, 10);
+        } catch (System.Exception exception) {
+            Debug.Log("Error: " + exception);
+        }
     }
 }

@@ -9,11 +9,25 @@ namespace GridDomain
     {
         // #### [++] Attributes [++] ####
         private Vector2Int _coordinates;
-        public Cell(Vector2Int coordinates)
-        {
-            this._coordinates = coordinates;
-        }
+        private GameObject _cellObject = null;
+        private Tile _tile = null;
         // #### [--] Attributes [--] #### 
+
+
+        // #### [++] Constructor [++] ####
+        public Cell(Vector2Int newCoordinates, int cellSize)
+        {
+            if (newCoordinates == null)
+            {
+                throw new System.Exception("<Cell> Cannot set null (Vector2Int)coordinates.");
+            }
+            this._coordinates = newCoordinates;
+            this._cellObject = (GameObject) new GameObject("Cell " + this._coordinates);
+
+            // set cell in the corresponding grid position
+            this._cellObject.transform.localPosition = getWorldPosition(this._coordinates.x, this._coordinates.y, cellSize);
+        }
+        // #### [--] Constructor [--] ####
 
 
         // #### [++] Getters & Setters [++] ####
@@ -22,16 +36,44 @@ namespace GridDomain
         {
             return this._coordinates;
         }
-        private void setCoordinates(Vector2Int coordinates)
+        private void setCoordinates(Vector2Int newCoordinates)
         {
-            this._coordinates = coordinates;
+            this._coordinates = newCoordinates;
         }
         // ---- [--] Coordinates [--] ---- 
+
+        // ---- [++] Tile [++] ---- 
+        public Tile getTile()
+        {
+            return this._tile;
+        }
+        public void setTile(Tile newTile)
+        {
+            if (newTile == null)
+            {
+                throw new System.Exception("<Cell " + this._coordinates.ToString() + "> Cannot set a null Tile.");
+            }
+            this._tile = newTile;
+
+            // make the new Tile object child of this Cell object
+            this._tile.getTileObject().transform.SetParent(this._cellObject.transform);
+        }
+        // ---- [--] Tile [--] ---- 
         // #### [--] Getters & Setters [--] ####
 
+        // #### [++] Utils [++] #### 
+        private Vector3 getWorldPosition(int x, int y, int cellSize)
+        {
+            return new Vector3(x, y) * cellSize;
+        }
+        // #### [--] Utils [--] #### 
+
+
+        // #### [++] Overrides [++] #### 
         public override string ToString()
         {
-            return "Tile " + this._coordinates.ToString();
+            return "Cell " + this._coordinates.ToString();
         }
+        // #### [--] Overrides [--] #### 
     }
 }
