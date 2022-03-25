@@ -132,8 +132,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 178506256}
+  - component: {fileID: 178506257}
   m_Layer: 0
-  m_Name: GameHandler
+  m_Name: GameCoordinator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -156,6 +157,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &178506257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 178506255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f3aa78e6f794684c8688c692ebfd25a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rows: 32
+  columns: 60
+  cellSize: 1.2
 --- !u!1 &445943750
 GameObject:
   m_ObjectHideFlags: 0
@@ -165,7 +181,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 445943752}
-  - component: {fileID: 445943751}
   - component: {fileID: 445943753}
   m_Layer: 0
   m_Name: GridTileSet_Service
@@ -174,21 +189,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &445943751
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 445943750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f3aa78e6f794684c8688c692ebfd25a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rows: 32
-  columns: 60
-  cellSize: 1.2
 --- !u!4 &445943752
 Transform:
   m_ObjectHideFlags: 0

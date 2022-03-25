@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 
 namespace GridDomain
 {
@@ -42,7 +43,7 @@ namespace GridDomain
                         
                         cell = (Cell) new Cell(coordinates, this._cellSize);
                         cell.setTile(tile);
-                        cell.getObject().transform.SetParent(this._gridObject.transform); // needs to be replaced by a set parent function between objects to be simpler
+                        cell.getObject().transform.SetParent(this._gridObject.transform);
                         gridArray[col, row] = cell;
                     } catch (System.Exception exception) {
                         throw new System.Exception("<GridMap> ->" + exception);
