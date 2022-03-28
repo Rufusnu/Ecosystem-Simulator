@@ -15,7 +15,7 @@ namespace GridDomain
 
 
         // #### [++] Constructor [++] ####
-        public Cell(Vector2Int newCoordinates, float cellSize)
+        public Cell(GameObject parent, Vector2Int newCoordinates, float cellSize)
         {
             if (newCoordinates == null)
             {
@@ -23,13 +23,30 @@ namespace GridDomain
             }
             this._coordinates = newCoordinates;
             setObject();
+            this._cellObject.transform.SetParent(parent.transform);
 
             // set cell in the corresponding grid position
             this._cellObject.transform.localPosition = getWorldPosition(this._coordinates.x, this._coordinates.y, cellSize);
         }
+
+        public Cell(GameObject parent, Vector2Int newCoordinates, float cellSize, Tile tile)
+        {
+            if (newCoordinates == null)
+            {
+                throw new System.Exception("<Cell> Cannot set null (Vector2Int)coordinates.");
+            }
+            this._coordinates = newCoordinates;
+            setObject();
+            setTile(tile);
+            this._cellObject.transform.SetParent(parent.transform);
+
+            // set cell in the corresponding grid position
+            this._cellObject.transform.localPosition = getWorldPosition(this._coordinates.x, this._coordinates.y, cellSize);
+        }
+
         private void setObject()
         {
-            this._cellObject = (GameObject) new GameObject("Cell " + this._coordinates);
+            this._cellObject = new GameObject("Cell " + this._coordinates);
         }
         // #### [--] Constructor [--] ####
 

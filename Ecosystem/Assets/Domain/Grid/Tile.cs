@@ -13,9 +13,16 @@ namespace GridDomain
 
 
         // #### [++] Constructor [++] ####
-        public Tile(Sprite newSprite)
+        public Tile(Sprite newSprite, Vector2Int coordinates)
         {
-            this._tileObject = (GameObject) new GameObject();
+            if (newSprite == null)
+            { // if the sprite is invalid -> select the default sprite
+                newSprite = GridTileSet_AssetService.instance.tile_default;
+                Debug.Log("<Tile> Sprite was not found. Falling back to default sprite.");
+            }
+
+            this._tileObject = new GameObject();
+            setObjectName("Tile " + coordinates);
             this._tileObjectSpriteRederer = this._tileObject.AddComponent<SpriteRenderer>();
             setSprite(newSprite);
         }

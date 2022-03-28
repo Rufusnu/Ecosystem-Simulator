@@ -19,31 +19,36 @@ namespace GridDomain
         // #### [++] Constructor [++] ####
         public GridMap(int rows, int cols, float cellSize)
         {
+            // create grid object and put it inside game container
             this._gridObject = new GameObject("Grid");
+            this._gridObject.transform.SetParent(GameObject.Find("GameContainer").transform);
+
             setRowsNumber(rows);
             setColsNumber(cols);
             setCellSize(cellSize);
-            gridArray = new Cell[cols, rows];
-            
+            ConstructGridArray();
+        }
+
+        void ConstructGridArray()
+        {
+            gridArray = new Cell[this._cols, this._rows];
             // create a <Cell> and <Tile> pointing to null to change its value for constructing the array 
             Cell cell = null;
             Tile tile = null;
+            Vector2Int coordinates;
 
             for (int col = 0; col < gridArray.GetLength(0); col++)
             {
                 for (int row = 0; row < gridArray.GetLength(1); row++)
                 {
                     try {
-                        // creating coordinates for the <Cell> and assigning it to the corresponding array position
-                        Vector2Int coordinates = new Vector2Int(col, row);
+                        // setting coordinates for the <Cell> and assigning it to the corresponding array position
+                        coordinates = new Vector2Int(col, row);
 
                         // creating tile to insert into cell; setting its sprite from the Asset Service Class
-                        tile = new Tile(GridTileSet_AssetService.instance.tile_default);
-                        tile.setObjectName("Tile " + coordinates + "");
-                        
-                        cell = (Cell) new Cell(coordinates, this._cellSize);
-                        cell.setTile(tile);
-                        cell.getObject().transform.SetParent(this._gridObject.transform);
+                        tile = new Tile(GridTileSet_AssetService.instance.tile_default, coordinates);
+                        cell = new Cell(this._gridObject, coordinates, this._cellSize, tile);
+
                         gridArray[col, row] = cell;
                     } catch (System.Exception exception) {
                         throw new System.Exception("<GridMap> ->" + exception);
