@@ -4,17 +4,25 @@ using UnityEngine;
 
 namespace Energy
 {
-    public class EnergySystem
+    public abstract class EnergySystem
     {
         // Responsable for every LivingEntity energy changes
-        public static EnergySystem instance; // make the instance visble and usable
 
-        private void Awake() {
-            instance = this;
+        // #### [++] Attributes [++] ####
+        public static float defaultEnergyValue = 0.8f; // 80%
+
+        // #### [--] Attributes [--] ####
+
+
+        // #### [++] Constructor [++] ####
+        public EnergySystem()
+        {
+
         }
+        // #### [--] Constructor [--] ####
 
         // methods to be implemented
-        public void executeUpdate()
+        public static void executeUpdate()
         {
 
         }

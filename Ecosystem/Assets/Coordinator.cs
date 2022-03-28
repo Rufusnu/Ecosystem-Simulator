@@ -38,6 +38,6 @@ public class Coordinator : MonoBehaviour
     void executeRepeatableFunctions()
     {
         // Energy System
-        EnergySystem.instance.executeUpdate();
+        EnergySystem.executeUpdate();
     }
 }
