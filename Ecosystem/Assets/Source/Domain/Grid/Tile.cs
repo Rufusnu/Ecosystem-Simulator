@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Mathematics;
 
 namespace GridDomain 
 {
@@ -13,7 +14,7 @@ namespace GridDomain
 
 
         // #### [++] Constructor [++] ####
-        public Tile(Sprite newSprite, Vector2Int coordinates)
+        public Tile(Sprite newSprite, int2 coordinates)
         {
             if (newSprite == null)
             { // if the sprite is invalid -> select the default sprite

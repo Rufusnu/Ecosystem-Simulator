@@ -23,11 +23,6 @@ namespace GameConfigDomain
         // ---- [++] Coordinator [++] ----
         public float UpdateIntervalOfEnergySystem = 3f;
         // ---- [--] Coordinator [--] ----
-
-
-        // ---- [++] Creature Brain [++] ----
-        public float UpdateIntervalOfCreatureBrain = 0.2f;
-        // ---- [++] Creature Brain [++] ----
         // ### [--] Config List [--] ###
     }
 

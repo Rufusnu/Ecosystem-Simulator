@@ -38,17 +38,20 @@
   <ItemGroup>
      <Compile Include="Assets\Source\Domain\Entity\LivingEntity.cs" />
      <Compile Include="Assets\Source\Systems\EnergySystem.cs" />
+     <Compile Include="Assets\Source\Config\GameConfig.cs" />
      <Compile Include="Assets\Source\Domain\Grid\GridMap.cs" />
      <Compile Include="Assets\Source\Domain\Grid\GridTileSet_AssetService.cs" />
      <Compile Include="Assets\Source\Coordinator.cs" />
      <Compile Include="Assets\Source\Domain\Grid\Tile.cs" />
+     <Compile Include="Assets\Source\Domain\Entity\CreatureBrain.cs" />
      <Compile Include="Assets\Source\Domain\Grid\Cell.cs" />
      <Compile Include="Assets\Source\Domain\Entity\Entity.cs" />
      <Compile Include="Assets\Source\Utils\Utils.cs" />
      <Compile Include="Assets\Source\Domain\Grid\Tester.cs" />
      <Compile Include="Assets\Source\Domain\Entity\Creature.cs" />
-     <Compile Include="Assets\Source\Domain\Entity\CreatureBrain.cs" />
-     <Compile Include="Assets\Source\Config\GameConfig.cs" />
+     <Compile Include="Assets\Source\Domain\Entity\Chromosome.cs" />
+     <Compile Include="Assets\Source\Domain\Entity\UtilsEntity.cs" />
+     <Compile Include="Assets\Source\Config\EntityConfig.cs" />
     <Reference Include="UnityEngine">
         <HintPath>D:\___FISIERE___\_Workspace\Informatica\Game dev\Unity\2020.3.30f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

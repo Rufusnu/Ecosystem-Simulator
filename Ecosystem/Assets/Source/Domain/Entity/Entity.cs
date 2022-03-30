@@ -1,30 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Mathematics;
 
 namespace EntityDomain
 {
-    public abstract class Entity
+    public abstract class Entity : MonoBehaviour
     {
         // #### [++] Attributes [++] ####
-        private Vector2Int _coordinates;
+        static int entityCounter = 0;
+        private int2 _coordinates;
         // #### [--] Attributes [--] ####
 
-        // #### [++] Constructor [++] ####
-        public Entity(Vector2Int newCoordinates)
+
+        // #### [++] Initialization [++] ####
+        public virtual void Initialize(int2 newCoordinates)
         {
             setCoordinates(newCoordinates);
         }
-        // #### [--] Constructor [--] ####
+        // #### [--] Initialization [--] ####
 
 
         // #### [++] Getters & Setters [++] ####
         // ---- [++] Coordinates [++] ---- 
-        public Vector2Int getCoordinates()
+        public int2 getCoordinates()
         {
             return this._coordinates;
         }
-        public void setCoordinates(Vector2Int newCoordinates)
+        public void setCoordinates(int2 newCoordinates)
         {
             this._coordinates = newCoordinates;
         }

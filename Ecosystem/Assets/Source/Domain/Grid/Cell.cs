@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using EntityDomain;
+using Unity.Mathematics;
 
 namespace GridDomain
 {
     public class Cell
     {
         // #### [++] Attributes [++] ####
-        private Vector2Int _coordinates;
+        private int2 _coordinates;
         private GameObject _cellObject = null;
         private Tile _tile = null;
         private Entity _entity = null; // what entity is on the cell; is it occupied? used for pathfinding
@@ -16,12 +17,8 @@ namespace GridDomain
 
 
         // #### [++] Constructor [++] ####
-        public Cell(GameObject parent, Vector2Int newCoordinates, float cellSize)
+        public Cell(GameObject parent, int2 newCoordinates, float cellSize)
         {
-            if (newCoordinates == null)
-            {
-                throw new System.Exception("<Cell> Cannot set null (Vector2Int)coordinates.");
-            }
             this._coordinates = newCoordinates;
             setObject();
             this._cellObject.transform.SetParent(parent.transform);
@@ -29,12 +26,8 @@ namespace GridDomain
             this._cellObject.transform.localPosition = getWorldPosition(this._coordinates.x, this._coordinates.y, cellSize);
         }
 
-        public Cell(GameObject parent, Vector2Int newCoordinates, float cellSize, Tile tile)
+        public Cell(GameObject parent, int2 newCoordinates, float cellSize, Tile tile)
         {
-            if (newCoordinates == null)
-            {
-                throw new System.Exception("<Cell> Cannot set null (Vector2Int)coordinates.");
-            }
             this._coordinates = newCoordinates;
             setObject();
             setTile(tile);
@@ -53,11 +46,11 @@ namespace GridDomain
 
         // #### [++] Getters & Setters [++] ####
         // ---- [++] Coordinates [++] ---- 
-        public Vector2Int getCoordinates()
+        public int2 getCoordinates()
         {
             return this._coordinates;
         }
-        private void setCoordinates(Vector2Int newCoordinates)
+        private void setCoordinates(int2 newCoordinates)
         {
             this._coordinates = newCoordinates;
         }

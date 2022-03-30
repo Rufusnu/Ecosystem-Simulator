@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils;
+using Unity.Mathematics;
 
 namespace GridDomain
 {
@@ -35,7 +36,7 @@ namespace GridDomain
             // create a <Cell> and <Tile> pointing to null to change its value for constructing the array 
             Cell cell = null;
             Tile tile = null;
-            Vector2Int coordinates;
+            int2 coordinates;
 
             for (int col = 0; col < gridArray.GetLength(0); col++)
             {
@@ -43,7 +44,7 @@ namespace GridDomain
                 {
                     try {
                         // setting coordinates for the <Cell> and assigning it to the corresponding array position
-                        coordinates = new Vector2Int(col, row);
+                        coordinates = new int2(col, row);
 
                         // creating tile to insert into cell; setting its sprite from the Asset Service Class
                         tile = new Tile(GridTileSet_AssetService.instance.tile_default, coordinates);

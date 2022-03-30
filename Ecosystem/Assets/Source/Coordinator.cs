@@ -5,6 +5,7 @@ using Energy;
 using GridDomain;
 using GameConfigDomain;
 using EntityDomain;
+using Unity.Mathematics;
 
 public class Coordinator : MonoBehaviour
 {
@@ -24,7 +25,6 @@ public class Coordinator : MonoBehaviour
     {
         this._time = 0;
         drawGrid();
-        this.test = new Creature(new Vector2Int(1,2));
     }
 
     // #### [++] Updates [++] ####

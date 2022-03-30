@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Energy;
-
+using Unity.Mathematics;
 
 namespace EntityDomain
 {
@@ -11,25 +11,20 @@ namespace EntityDomain
         // can send signals to energy system and energy system decides what to do with this object's energy levels
 
         // #### [++] Attributes [++] ####
+        static int livingEntityCounter = 0;
+         private Chromosome _chromosome;
         private float _energy;
         // #### [--] Attributes [--] ####
 
 
-        // #### [++] Constructor [++] ####
-        public LivingEntity(Vector2Int newCoordinates, float newEnergy) : base (newCoordinates) // used to call base class <Entity> constructor for inherited attributes
+        // #### [++] Initialization [++] ####
+        public override void Initialize(int2 newCoordinates)
         {
-            if (newEnergy <= 0)
-            {
-                throw new System.Exception("<Entity> Cannot set negative or equal to zero energy.");
-            }
-            this._energy = newEnergy;
-        }
-
-        public LivingEntity(Vector2Int newCoordinates) : base (newCoordinates) // used to call base class <Entity> constructor for inherited attributes
-        {
+            base.Initialize(newCoordinates);
+            LivingEntity.livingEntityCounter++;
             this._energy = EnergySystem.defaultEnergyValue;
         }
-        // #### [--] Constructor [--] ####
+        // #### [--] Initialization [--] ####
 
         
         // #### [++] Getters & Setters [++] ####
@@ -48,6 +43,9 @@ namespace EntityDomain
         // ---- [++] Energy [++] ---- 
         // #### [--] Getters & Setters [--] ####
 
-    }
 
+        // #### [++] Behaviour [++] ####
+        protected abstract void eat(LivingEntity entity); // to be implemented by Plants and Creatures
+        // #### [--] Behaviour [--] ####
+    }
 }

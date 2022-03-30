@@ -24,7 +24,7 @@ namespace EntityDomain
         // Update is called once per frame
         void Update()
         {
-            executeEvery(GameConfig.instance.UpdateIntervalOfCreatureBrain);
+            executeEvery(EntityConfig.instance.UpdateIntervalOfCreatureBrain);
         }
         private void executeEvery(float seconds)
         {
@@ -32,7 +32,7 @@ namespace EntityDomain
             this._time += Time.deltaTime;
             if (this._time >= seconds)
             {
-                this._creature.brainUpdate(); // call updater in creature's object
+                //this._creature.brainUpdate(); // call updater in creature's object
                 this._time = 0;
             }
         }
