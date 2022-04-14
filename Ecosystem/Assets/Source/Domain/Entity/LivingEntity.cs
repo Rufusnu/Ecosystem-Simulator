@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Energy;
 using Unity.Mathematics;
+// project domains
+using Energy;
+using GeneticsDomain;
 
 namespace EntityDomain
 {
@@ -11,9 +13,9 @@ namespace EntityDomain
         // can send signals to energy system and energy system decides what to do with this object's energy levels
 
         // #### [++] Attributes [++] ####
-        static int livingEntityCounter = 0;
-         private Chromosome _chromosome;
-        private float _energy;
+        public static int livingEntityCounter = 0;
+        protected Chromosome _chromosome;
+        protected float _energy;
         // #### [--] Attributes [--] ####
 
 

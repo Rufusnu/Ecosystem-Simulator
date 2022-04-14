@@ -14,14 +14,14 @@ namespace GameConfigDomain
 
         // ### [++] Config List [++] ###
         // ---- [++] Grid [++] ---- 
-        public int GridRows = 8;
-        public int GridColumns = 8;
-        public float GridCellSize = 5;
+        public int GridRows = 8; // default
+        public int GridColumns = 8; // default
+        public float GridCellSize = 1.2f; // default
         // ---- [--] Grid [--] ---- 
 
 
         // ---- [++] Coordinator [++] ----
-        public float UpdateIntervalOfEnergySystem = 3f;
+        public float UpdateIntervalOfEnergySystem = 3f; // default 3 seconds
         // ---- [--] Coordinator [--] ----
         // ### [--] Config List [--] ###
     }

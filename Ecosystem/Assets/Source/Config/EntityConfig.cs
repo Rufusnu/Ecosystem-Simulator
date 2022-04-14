@@ -12,11 +12,11 @@ public class EntityConfig : MonoBehaviour
 
         // ### [++] Config List [++] ###
         // ---- [++] Entity Genetics [++] ----
-        public float MutationFactor = 0.05f;
+        public float MutationFactor = 0.05f; // default 5%
         // ---- [--] Entity Genetics [--] ----
 
         // ---- [++] Creature Brain [++] ----
-        public float UpdateIntervalOfCreatureBrain = 0.2f;
+        public float UpdateIntervalOfCreatureBrain = 0.2f; // default 200ms
         // ---- [--] Creature Brain [--] ----
         // ### [--] Config List [--] ###
 }

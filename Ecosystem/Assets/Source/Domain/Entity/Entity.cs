@@ -8,8 +8,8 @@ namespace EntityDomain
     public abstract class Entity : MonoBehaviour
     {
         // #### [++] Attributes [++] ####
-        static int entityCounter = 0;
-        private int2 _coordinates;
+        public static int entityCounter = 0;
+        protected int2 _coordinates;
         // #### [--] Attributes [--] ####
 
 
@@ -23,11 +23,11 @@ namespace EntityDomain
 
         // #### [++] Getters & Setters [++] ####
         // ---- [++] Coordinates [++] ---- 
-        public int2 getCoordinates()
+        public virtual int2 getCoordinates()
         {
             return this._coordinates;
         }
-        public void setCoordinates(int2 newCoordinates)
+        public virtual void setCoordinates(int2 newCoordinates)
         {
             this._coordinates = newCoordinates;
         }

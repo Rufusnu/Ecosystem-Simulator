@@ -10,6 +10,7 @@ namespace Energy
 
         // #### [++] Attributes [++] ####
         public static float defaultEnergyValue = 0.8f; // 80%
+        
 
         // #### [--] Attributes [--] ####
 
@@ -17,7 +18,7 @@ namespace Energy
         // methods to be implemented
         public static void executeUpdate()
         {
-
+            
         }
     }
 }
