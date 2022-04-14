@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GridDomain;
+using GameConfigDomain;
 
 namespace Energy
 {
@@ -18,7 +20,8 @@ namespace Energy
         // methods to be implemented
         public static void executeUpdate()
         {
-            
+
+            GridMap.currentGridInstance.consumeAllCreaturesEnergy(GameConfig.instance.EnergyConsumedOnUpdateEnergySystem);
         }
     }
 }

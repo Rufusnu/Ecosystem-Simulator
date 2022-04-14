@@ -21,7 +21,8 @@ namespace GameConfigDomain
 
 
         // ---- [++] Coordinator [++] ----
-        public float UpdateIntervalOfEnergySystem = 3f; // default 3 seconds
+        public float UpdateIntervalOfEnergySystem = 3.0f; // default 3 seconds
+        public float EnergyConsumedOnUpdateEnergySystem = 0.05f;
         // ---- [--] Coordinator [--] ----
         // ### [--] Config List [--] ###
     }

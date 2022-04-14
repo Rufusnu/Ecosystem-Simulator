@@ -32,7 +32,7 @@ namespace GridDomain
 
         // #### [++] Getters & Setters [++] ####
         // ---- [++] Sprite [++] ---- 
-        public void setSprite(Sprite newSprite)
+        public virtual void setSprite(Sprite newSprite)
         {
             if (newSprite == null)
             {
@@ -40,14 +40,14 @@ namespace GridDomain
             }
             this._tileObjectSpriteRederer.sprite = newSprite;
         }
-        public Sprite getSprite()
+        public virtual Sprite getSprite()
         {
             return this._tileObjectSpriteRederer.sprite;
         }
         // ---- [--] Sprite [--] ---- 
 
         // ---- [++] Tile Object[++] ---- 
-        public void setObject(GameObject newTileObject)
+        public virtual void setObject(GameObject newTileObject)
         {
             if (newTileObject == null)
             {
@@ -55,14 +55,14 @@ namespace GridDomain
             }
             this._tileObject = newTileObject;
         }
-        public GameObject getObject()
+        public virtual GameObject getObject()
         {
             return this._tileObject;
         }
         // ---- [--] Tile Object [--] ---- 
 
         // ---- [++] Tile Object Name [++] ---- 
-        public void setObjectName(string newName)
+        public virtual void setObjectName(string newName)
         {
             if (newName == null)
             {
@@ -70,7 +70,7 @@ namespace GridDomain
             }
             this._tileObject.name = newName;
         }
-        public string getObjectName()
+        public virtual string getObjectName()
         {
             return this._tileObject.name;
         }

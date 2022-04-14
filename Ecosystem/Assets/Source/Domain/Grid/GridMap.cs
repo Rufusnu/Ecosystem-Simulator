@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 using Unity.Mathematics;
+using EntityDomain;
+using GameConfigDomain;
 
 namespace GridDomain
 {
     public class GridMap
     {
+        public static GridMap currentGridInstance;
+
         // #### [++] Attributes [++] ####
         private GameObject _gridObject = null; 
         private float _cellSize;
@@ -20,6 +24,8 @@ namespace GridDomain
         // #### [++] Constructor [++] ####
         public GridMap(int rows, int cols, float cellSize)
         {
+            // if there is already a gridmap -> do nothing -> previous gridmap needs to be destroyed
+
             // create grid object and put it inside game container
             this._gridObject = new GameObject("Grid");
             this._gridObject.transform.SetParent(GameObject.Find("GameObjects").transform);
@@ -28,9 +34,10 @@ namespace GridDomain
             setColsNumber(cols);
             setCellSize(cellSize);
             ConstructGridArray();
+            GridMap.currentGridInstance = this;
         }
 
-        void ConstructGridArray()
+        private void ConstructGridArray()
         {
             gridArray = new Cell[this._cols, this._rows];
             // create a <Cell> and <Tile> pointing to null to change its value for constructing the array 
@@ -74,8 +81,7 @@ namespace GridDomain
             }
             this._cellSize = newCellSize;
         }
-        // ---- [--] Cell Size [--] ----
-
+        // ---- [--] Cell Size [--] ----0
 
         // ---- [++] Rows [++] ----
         public int getRowsNumber()
@@ -113,7 +119,7 @@ namespace GridDomain
         {
             if (newPosition == null)
             {
-                throw new System.Exception("<GridMap> Cannot set null position.");
+                throw new System.Exception("<GridMap> Cannot set null Vector3 transform position.");
             }
             this._gridObject.transform.position = newPosition;
         }
@@ -125,6 +131,21 @@ namespace GridDomain
             int cols = this._cols - 1;
             return new Vector3(-cols * this._cellSize/2, -rows * this._cellSize /2, 0);
         }
-        // ---- [++] Change Grid Position [++] ----
+        // ---- [--] Change Grid Position [--] ----
+
+
+        // #### [++] Methods [++] ####
+        public void consumeAllCreaturesEnergy(float amount)
+        {
+            foreach(Cell cell in this.gridArray)
+            {
+                if(cell.getEntity().GetType() == typeof(LivingEntity))
+                {   // if cell contains a living entity, consume its energy by the configured amount in GameConfig
+                    LivingEntity foundLivingEntity = (LivingEntity)cell.getEntity();
+                    foundLivingEntity.addEnergy(amount);
+                }
+            }
+        }
+        // #### [--] Methods [--] ####
     }
 }

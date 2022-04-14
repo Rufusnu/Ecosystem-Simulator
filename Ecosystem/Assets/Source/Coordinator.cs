@@ -15,6 +15,7 @@ public class Coordinator : MonoBehaviour
 
     // !! Need to implement different intervals for the various type of updates
     Creature test;
+    GridMap grid;
     private float _time;
 
     void Awake()
@@ -55,8 +56,8 @@ public class Coordinator : MonoBehaviour
     private void drawGrid()
     {
         try {
-            GridMap grid = new GridMap(GameConfig.instance.GridRows, GameConfig.instance.GridColumns, GameConfig.instance.GridCellSize);
-            grid.positionTo(grid.getCenter());
+            this.grid = new GridMap(GameConfig.instance.GridRows, GameConfig.instance.GridColumns, GameConfig.instance.GridCellSize);
+            this.grid.positionTo(this.grid.getCenter());
         } catch (System.Exception exception) {
             Debug.Log("Error: " + exception);
         }

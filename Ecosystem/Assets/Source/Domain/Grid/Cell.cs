@@ -10,13 +10,19 @@ namespace GridDomain
     {
         // #### [++] Attributes [++] ####
         private int2 _coordinates;
+        private int _cellSize;
         private GameObject _cellObject = null;
-        private Tile _tile = null;
-        private Entity _entity = null; // what entity is on the cell; is it occupied? used for pathfinding
+        private Tile _tile = new NullTile();
+        private Entity _entity = new NullEntity(); // what entity is on the cell; is it occupied? used for pathfinding
         // #### [--] Attributes [--] #### 
 
 
         // #### [++] Constructor [++] ####
+        public Cell()
+        {
+            this._coordinates = new int2(0, 0);
+            setObject();
+        }
         public Cell(GameObject parent, int2 newCoordinates, float cellSize)
         {
             this._coordinates = newCoordinates;
@@ -37,9 +43,10 @@ namespace GridDomain
             this._cellObject.transform.localPosition = getWorldPosition(this._coordinates.x, this._coordinates.y, cellSize);
         }
 
-        private void setObject()
-        {
-            this._cellObject = new GameObject("Cell " + this._coordinates);
+        // ---- [++] Copy constructor [++] ----
+        public Cell(Cell otherCell) : this(otherCell.getObject().transform.parent.gameObject, otherCell.getCoordinates(), otherCell.getCellSize(), otherCell.getTile())
+        {   
+            // might need some validation
         }
         // #### [--] Constructor [--] ####
 
@@ -56,6 +63,17 @@ namespace GridDomain
         }
         // ---- [--] Coordinates [--] ---- 
 
+        // ---- [++] Cell Size [++] ---- 
+        public int getCellSize()
+        {
+            return this._cellSize;
+        }
+        private void setCellSize(int newCellSize)
+        {
+            this._cellSize = newCellSize;
+        }
+        // ---- [--] Cell Size [--] ---- 
+
         // ---- [++] Tile [++] ---- 
         public Tile getTile()
         {
@@ -63,10 +81,6 @@ namespace GridDomain
         }
         public void setTile(Tile newTile)
         {
-            if (newTile == null)
-            {
-                throw new System.Exception("<Cell " + this._coordinates.ToString() + "> Cannot set a null Tile.");
-            }
             this._tile = newTile;
 
             // make the new Tile object child of this Cell object
@@ -76,6 +90,10 @@ namespace GridDomain
         // ---- [--] Tile [--] ---- 
 
         // ---- [++] Cell Object[++] ---- 
+        private void setObject()
+        {
+            this._cellObject = new GameObject("Cell " + this._coordinates);
+        }
         public GameObject getObject()
         {
             return this._cellObject;
@@ -103,7 +121,7 @@ namespace GridDomain
 
         public bool isOccupied()
         {
-            if (this._entity != null)
+            if (this._entity.GetType() != typeof(NullEntity))
             {
                 return true;
             }

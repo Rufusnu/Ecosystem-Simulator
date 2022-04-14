@@ -9,7 +9,7 @@ namespace EntityDomain
     {
         // #### [++] Attributes [++] ####
         public static int entityCounter = 0;
-        protected int2 _coordinates;
+        private int2 _coordinates;
         // #### [--] Attributes [--] ####
 
 

@@ -10,12 +10,13 @@ namespace EntityDomain
 {
     public abstract class LivingEntity : Entity
     {
+        
         // can send signals to energy system and energy system decides what to do with this object's energy levels
 
         // #### [++] Attributes [++] ####
         public static int livingEntityCounter = 0;
-        protected Chromosome _chromosome;
-        protected float _energy;
+        private Chromosome _chromosome;
+        private float _energy;
         // #### [--] Attributes [--] ####
 
 
@@ -41,6 +42,10 @@ namespace EntityDomain
         public float getEnergy()
         {
             return this._energy;
+        }
+        public void addEnergy(float amount)
+        {
+            this._energy += amount;
         }
         // ---- [++] Energy [++] ---- 
         // #### [--] Getters & Setters [--] ####

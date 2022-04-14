@@ -5,6 +5,21 @@ using Unity.Mathematics;
 
 namespace EntityDomain
 {
+    public enum CreatureState 
+    {   // to be moved in a separate file
+        None,
+        Thinking,
+        Searching,
+        GoingToEat,
+        Eating,
+        GoingToDrink,
+        Drinking,
+        Hunting,
+        Fleeing,
+        GoingToMate,
+        Mating
+    }
+
     public class Creature : LivingEntity
     {
         // #### [++] Attributes [++] ####
@@ -12,6 +27,7 @@ namespace EntityDomain
         const int NumberOfGenes = 0; // number of attributes that can be mutated
         private float _time;
         private float _randomInterval;
+        protected CreatureState _state;
         // #### [--] Attributes [--] ####
 
 
@@ -61,6 +77,46 @@ namespace EntityDomain
 
 
         // #### [++] Behaviour [++] ####
+        protected void act()
+        {
+            switch(this._state)
+            {
+                case CreatureState.None:
+                    this._state = CreatureState.Thinking;
+                    break;
+                case CreatureState.Thinking:
+                    // checks what does it need
+                    break;
+                case CreatureState.Searching:
+                    // moves one cell then resets to thinking
+                    break;
+                case CreatureState.GoingToEat:
+                    // moves to food one cell then resets to thinking
+                    break;
+                case CreatureState.Eating:
+                    // eats food then resets to thinking
+                    break;
+                case CreatureState.GoingToDrink:
+                    // moves to water one cell then resets to thinking
+                    break;
+                case CreatureState.Drinking:
+                    // drinks then resets to thinking
+                    break;
+                case CreatureState.Hunting:
+                    // moves towards pray one cell then resets to thinking
+                    break;
+                case CreatureState.Fleeing:
+                    // runs away from hunter one cell then resets to thinking
+                    break;
+                case CreatureState.GoingToMate:
+                    // moves towards mate one cell then resets to thinking
+                    break;
+                case CreatureState.Mating:
+                    // mates then resets to thinking
+                    break;
+            }
+        }
+
         protected override void eat(LivingEntity entity)
         {
             // TO DO
