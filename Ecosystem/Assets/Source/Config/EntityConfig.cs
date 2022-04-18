@@ -11,8 +11,10 @@ public class EntityConfig : MonoBehaviour
         }
 
         // ### [++] Config List [++] ###
+        //public GameObject CreaturePrefab;
+
         // ---- [++] Entity Genetics [++] ----
-        public float MutationFactor = 0.05f; // default 5%
+        public float MutationFactor = 0.05f; // default
         // ---- [--] Entity Genetics [--] ----
 
         // ---- [++] Creature Brain [++] ----

@@ -7,31 +7,26 @@ namespace GeneticsDomain
     public class Chromosome
     {
         // #### [++] Attributes [++] ####
-        private float[] _genes;
+        private List<float> _genes = new List<float>();
         private int _genesCount;
         // #### [--] Attributes [--] ####
 
 
         // #### [++] Constructor [++] ####
-        private Chromosome(int newGenesCount)
+        public Chromosome()
         {
-            if (newGenesCount < 4)
-            {
-                throw new System.Exception("<Chromosome> Cannot set genes count lower than four.");
-            }
-            this._genesCount = newGenesCount;
-            this._genes = new float[this._genesCount];
+            this._genesCount = 0;
         }
         // #### [--] Constructor [--] ####
 
 
         // #### [++] Getters & Setters [++] ####
         // ---- [++] Genes [++] ---- 
-        public float[] getGenes()
+        public List<float> getGenes()
         {
             return this._genes;
         }
-        private void setGenes(float[] newGenes)
+        private void setGenes(List<float> newGenes)
         {
             if (newGenes == null)
             {
@@ -39,7 +34,15 @@ namespace GeneticsDomain
             }
             this._genes = newGenes;
         }
-        // ---- [--] Genes [--] ---- 
+        public void addGene(float gene)
+        {
+            this._genes.Add(gene);
+        }
+        public int getGenesCount()
+        {
+            return this._genesCount;
+        }
+        // ---- [--] Genes [--] ----
         // #### [--] Getters & Setters [--] ####
 
 
@@ -48,54 +51,60 @@ namespace GeneticsDomain
         public void inheritGenes(Chromosome parentMaleChromosome, Chromosome parentFemaleChromosome)
         {
             // make a copy of the genes
-            float[] genesMale = parentMaleChromosome.getGenes();
-            float[] genesFemale = parentFemaleChromosome.getGenes();
+            List<float> genesMale = parentMaleChromosome.getGenes();
+            List<float> genesFemale = parentFemaleChromosome.getGenes();
 
-            if (parentMaleChromosome.getGenes().Length != parentMaleChromosome.getGenes().Length)
+            if (parentMaleChromosome.getGenes().Count != parentMaleChromosome.getGenes().Count)
             {
                 throw new System.Exception("<Chromosome> Cannot inherit from two chromosomes of different lenght.");
             }
-            if (parentMaleChromosome.getGenes().Length != this._genesCount)
-            {
-                throw new System.Exception("<Chromosome> Cannot inherit from chromosomes of different lenght from this chromosome's lenght.");
-            }
 
             // create empty genes
-            float[] genesOffspring = new float[this._genesCount];
-            inheritParentsRandomly(genesOffspring, genesMale, genesFemale);
-            mutateGenes(genesOffspring);
-            setGenes(genesOffspring);
+            inheritParentsRandomly(this._genes, genesMale, genesFemale);
+            mutateGenes(this._genes);
         }
-        private void inheritParentsRandomly(float[] genesOffspring, float[] genesMale, float[] genesFemale)
+        private void inheritParentsRandomly(List<float> genesOffspring, List<float> genesMale, List<float> genesFemale)
         {
             // randomly choose genes from parents
             int parent = 0;
-            for(int geneIndex = 0; geneIndex < genesMale.Length; geneIndex++)
+            for(int geneIndex = 0; geneIndex < genesMale.Count; geneIndex++)
             {
                 parent = Random.Range(0,1); // select parent randomly
                 if (UtilsGenetics.instance.intToGender(parent) == "female") // dictionary used to make code easier to follow
                 {   // inherit female gene
-                    genesOffspring[geneIndex] = genesFemale[geneIndex];
+                    genesOffspring.Add(genesFemale[geneIndex]);
                 }
                 else
                 {   // inherit male gene
-                    genesOffspring[geneIndex] = genesMale[geneIndex];
+                    genesOffspring.Add(genesMale[geneIndex]);
                 }
             }
         }
-        private void mutateGenes(float[] newGenes)
+        private void mutateGenes(List<float> newGenes)
         {
             // randomly mutate some of the genes
             int toMutate = 0;
-            for(int geneIndex = 0; geneIndex < newGenes.Length; geneIndex++)
+            for(int geneIndex = 0; geneIndex < newGenes.Count; geneIndex++)
             {
                 // randomly choose which genes to mutate
                 toMutate = Random.Range(0,1);
                 if (toMutate == 1)
-                {   // selected genes mutate randomly between 95% and 105% of current value
-                    newGenes[geneIndex] *= Random.Range(1 - EntityConfig.instance.MutationFactor, 1 + EntityConfig.instance.MutationFactor);
+                {   
+                    newGenes[geneIndex] = mutateGene(newGenes[geneIndex]);
                 }
             }
+        }
+        private float mutateGene(float gene)
+        {
+            // selected genes mutate randomly between -0.05 and 0.05 of current value
+            // TO DO : change so it mutates less and less as it gets close to the boundries
+
+            float mutatedGene = gene + Random.Range(-EntityConfig.instance.MutationFactor, EntityConfig.instance.MutationFactor);
+            while (mutatedGene == gene || mutatedGene < -1.0f || mutatedGene > 1.0f)
+            {
+                mutatedGene = gene + Random.Range(-EntityConfig.instance.MutationFactor, EntityConfig.instance.MutationFactor);
+            }
+            return mutatedGene;
         }
         // ---- [--] Genes Inheritance [--] ---- 
         // #### [--] Behaviour [--] ####

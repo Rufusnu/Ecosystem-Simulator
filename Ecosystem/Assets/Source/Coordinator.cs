@@ -32,6 +32,7 @@ public class Coordinator : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        this.grid.updateCreatures();
         executeEvery(GameConfig.instance.UpdateIntervalOfEnergySystem);
     }
 

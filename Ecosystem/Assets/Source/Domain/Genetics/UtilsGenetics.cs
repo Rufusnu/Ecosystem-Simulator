@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace GeneticsDomain
 {
+    public enum CreatureGender
+    {
+        Male,
+        Female
+    }
+
     public class UtilsGenetics : MonoBehaviour
     {
         public static UtilsGenetics instance; // make the instance visble and usable

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GridDomain;
 using GameConfigDomain;
+using EntityDomain;
 
 namespace Energy
 {
@@ -12,7 +13,6 @@ namespace Energy
 
         // #### [++] Attributes [++] ####
         public static float defaultEnergyValue = 0.8f; // 80%
-        
 
         // #### [--] Attributes [--] ####
 
@@ -20,7 +20,6 @@ namespace Energy
         // methods to be implemented
         public static void executeUpdate()
         {
-
             GridMap.currentGridInstance.consumeAllCreaturesEnergy(GameConfig.instance.EnergyConsumedOnUpdateEnergySystem);
         }
     }

@@ -23,6 +23,7 @@ namespace GameConfigDomain
         // ---- [++] Coordinator [++] ----
         public float UpdateIntervalOfEnergySystem = 3.0f; // default 3 seconds
         public float EnergyConsumedOnUpdateEnergySystem = 0.05f;
+        public int SpawnEntityProbability = 40; // spawn 1 every [SpawnEntityProbability] tiles
         // ---- [--] Coordinator [--] ----
         // ### [--] Config List [--] ###
     }

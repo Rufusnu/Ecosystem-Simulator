@@ -8,10 +8,7 @@ namespace EntityDomain
     public sealed class NullEntity : Entity
     {
         // #### [++] Initialization [++] ####
-        public void Initialize()
-        {
-            base.Initialize(new int2(0, 0));
-        }
+        public NullEntity() : base(new int2(0, 0))  {}
         // #### [--] Initialization [--] ####
 
 

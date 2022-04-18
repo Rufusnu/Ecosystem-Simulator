@@ -21,9 +21,8 @@ namespace EntityDomain
 
 
         // #### [++] Initialization [++] ####
-        public override void Initialize(int2 newCoordinates)
+        public LivingEntity(int2 newCoordinates) : base(newCoordinates)
         {
-            base.Initialize(newCoordinates);
             LivingEntity.livingEntityCounter++;
             this._energy = EnergySystem.defaultEnergyValue;
         }

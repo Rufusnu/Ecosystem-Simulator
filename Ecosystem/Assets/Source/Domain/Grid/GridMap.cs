@@ -13,11 +13,13 @@ namespace GridDomain
         public static GridMap currentGridInstance;
 
         // #### [++] Attributes [++] ####
-        private GameObject _gridObject = null; 
+        private GameObject _gridObject = null;
         private float _cellSize;
         private int _cols;
         private int _rows;
         private Cell[,] gridArray;
+        ArrayList grid;
+        //private List<LivingEntity> _creatures = new List<LivingEntity>();
         // #### [--] Attributes [--] #### 
 
 
@@ -34,6 +36,7 @@ namespace GridDomain
             setColsNumber(cols);
             setCellSize(cellSize);
             ConstructGridArray();
+            addRandomCreatures();
             GridMap.currentGridInstance = this;
         }
 
@@ -41,10 +44,11 @@ namespace GridDomain
         {
             gridArray = new Cell[this._cols, this._rows];
             // create a <Cell> and <Tile> pointing to null to change its value for constructing the array 
-            Cell cell = null;
-            Tile tile = null;
+            Cell cell;
+            Tile tile;
             int2 coordinates;
 
+            
             for (int col = 0; col < gridArray.GetLength(0); col++)
             {
                 for (int row = 0; row < gridArray.GetLength(1); row++)
@@ -60,6 +64,37 @@ namespace GridDomain
                         gridArray[col, row] = cell;
                     } catch (System.Exception exception) {
                         throw new System.Exception("<GridMap> ->" + exception);
+                    }
+                }
+            }
+        }
+
+        private void addRandomCreatures()
+        {
+            Creature newCreature;
+            for (int col = 0; col < gridArray.GetLength(0); col++)
+            {
+                for (int row = 0; row < gridArray.GetLength(1); row++)
+                {
+                    int doSpawn = UnityEngine.Random.Range(1, GameConfig.instance.SpawnEntityProbability);
+                    if (doSpawn == 1)
+                    {
+                        Debug.Log("Spawning creature...");
+                        newCreature = new Creature(new int2(col, row));
+
+                        Transform newCreatureTransform = newCreature.getObject().transform;
+                        newCreatureTransform.SetParent(this._gridObject.transform);
+                        
+                        // set cell in the corresponding grid position
+                        newCreatureTransform.localPosition = new Vector3(col * this._cellSize, row * this._cellSize, newCreatureTransform.position.z - 5);
+                        //this._creatures.Add(newCreature);
+                        this.gridArray[col, row].setEntity(newCreature);
+
+                        /*Debug.Log("prefab: " + EntityConfig.instance.CreaturePrefab);
+                        newCreature = GameObject.Instantiate(EntityConfig.instance.CreaturePrefab, gridArray[col, row].getObject().transform.position, gridArray[col, row].getObject().transform.rotation);
+                        newCreature.GetComponent<Creature>().Initialize(new int2(col, row));
+                        Debug.Log(newCreature.name + " coordinates " + newCreature.GetComponent<Creature>().getCoordinates());
+                        gridArray[col, row].setEntity(newCreature.GetComponent<Creature>());*/
                     }
                 }
             }
@@ -112,6 +147,13 @@ namespace GridDomain
             this._cols = newCols;
         }
         // ---- [--] Cols [--] ----
+
+        // ---- [++] Alive Creature List [++] ----
+        /*public List<LivingEntity> getCreatures()
+        {
+            return this._creatures;
+        }*/
+        // ---- [--] Alive Creature List [--] ----
         // #### [--] Getters & Setters [--] ####
 
         // ---- [++] Change Grid Position [++] ----
@@ -135,14 +177,39 @@ namespace GridDomain
 
 
         // #### [++] Methods [++] ####
+        public void updateCreatures()
+        {
+            /*foreach(Creature creature in this._creatures)
+            {
+                creature.updateBrain();
+            }*/
+            if (this.gridArray != null)
+            {
+                foreach(Cell cell in this.gridArray)
+                {
+                    if(cell.getEntity().GetType() == typeof(Creature))
+                    {   // if cell contains a living entity, consume its energy by the configured amount in GameConfig
+                        Creature foundLivingEntity = (Creature)cell.getEntity();
+                        foundLivingEntity.updateBrain();
+                    }
+                }
+            }
+        }
         public void consumeAllCreaturesEnergy(float amount)
         {
-            foreach(Cell cell in this.gridArray)
+            /*foreach(LivingEntity creature in this._creatures)
             {
-                if(cell.getEntity().GetType() == typeof(LivingEntity))
-                {   // if cell contains a living entity, consume its energy by the configured amount in GameConfig
-                    LivingEntity foundLivingEntity = (LivingEntity)cell.getEntity();
-                    foundLivingEntity.addEnergy(amount);
+                creature.addEnergy(amount);
+            }*/
+            if (this.gridArray != null)
+            {
+                foreach(Cell cell in this.gridArray)
+                {
+                    if(cell.getEntity().GetType() == typeof(LivingEntity))
+                    {   // if cell contains a living entity, consume its energy by the configured amount in GameConfig
+                        LivingEntity foundLivingEntity = (LivingEntity)cell.getEntity();
+                        foundLivingEntity.addEnergy(amount);
+                    }
                 }
             }
         }

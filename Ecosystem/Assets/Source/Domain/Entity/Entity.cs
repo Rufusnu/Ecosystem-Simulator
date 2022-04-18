@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 namespace EntityDomain
 {
-    public abstract class Entity : MonoBehaviour
+    public abstract class Entity
     {
         // #### [++] Attributes [++] ####
         public static int entityCounter = 0;
@@ -14,7 +14,7 @@ namespace EntityDomain
 
 
         // #### [++] Initialization [++] ####
-        public virtual void Initialize(int2 newCoordinates)
+        public Entity(int2 newCoordinates)
         {
             setCoordinates(newCoordinates);
         }

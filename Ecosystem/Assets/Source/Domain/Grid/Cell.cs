@@ -12,7 +12,7 @@ namespace GridDomain
         private int2 _coordinates;
         private int _cellSize;
         private GameObject _cellObject = null;
-        private Tile _tile = new NullTile();
+        private Tile _tile = null;
         private Entity _entity = new NullEntity(); // what entity is on the cell; is it occupied? used for pathfinding
         // #### [--] Attributes [--] #### 
 

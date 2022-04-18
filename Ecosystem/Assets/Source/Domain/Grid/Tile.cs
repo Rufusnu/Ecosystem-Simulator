@@ -8,7 +8,7 @@ namespace GridDomain
     public class Tile
     {
         // #### [++] Attributes [++] ####
-        private GameObject _tileObject; // Used to set Tile Sprite
+        private GameObject _tileObject = null; // Used to set Tile Sprite
         private SpriteRenderer _tileObjectSpriteRederer; // Tile Sprite
         // #### [--] Attributes [--] ####
 
