@@ -18,7 +18,10 @@ public class EntityConfig : MonoBehaviour
         // ---- [--] Entity Genetics [--] ----
 
         // ---- [++] Creature Brain [++] ----
-        public float UpdateIntervalOfCreatureBrain = 0.2f; // default 200ms
+        public float UpdateIntervalOfCreatureBrain = 0.5f; // default 200ms
+        public int SightDistanceInCells = 2;
+        public float MoveDuration = 1.0f; // seconds
+        public float MoveSpeed = 3.0f;
         // ---- [--] Creature Brain [--] ----
         // ### [--] Config List [--] ###
 }

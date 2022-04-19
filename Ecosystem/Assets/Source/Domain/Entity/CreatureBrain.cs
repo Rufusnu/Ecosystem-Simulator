@@ -6,7 +6,11 @@ using GameConfigDomain;
 namespace EntityDomain
 {
     public class CreatureBrain : MonoBehaviour
-    {
+    {   // NOT USED
+
+
+
+    
         // #### [++] Attributes [++] ####
         private float _time;
         private Creature _creature;

@@ -6,7 +6,10 @@ using GridDomain;
 namespace EntityDomain
 {
     public static class ActManager
-    { // unused yet
+    {   // unused yet
+
+
+    
         static GridMap currentGridInstance;
     }
 }

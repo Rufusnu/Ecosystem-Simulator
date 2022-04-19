@@ -529,7 +529,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MutationFactor: 0.05
-  UpdateIntervalOfCreatureBrain: 1
+  UpdateIntervalOfCreatureBrain: 0.5
+  SightDistanceInCells: 2
+  MoveDuration: 1
+  MoveSpeed: 3
 --- !u!1 &1740101901
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,4 +625,4 @@ MonoBehaviour:
   GridCellSize: 1.2
   UpdateIntervalOfEnergySystem: 3
   EnergyConsumedOnUpdateEnergySystem: 0.05
-  SpawnEntityProbability: 40
+  SpawnEntityProbability: 5

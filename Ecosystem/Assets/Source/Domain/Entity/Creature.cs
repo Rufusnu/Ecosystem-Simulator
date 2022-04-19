@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Mathematics;
 using GeneticsDomain;
+using GridDomain;
 
 namespace EntityDomain
 {
@@ -39,6 +40,7 @@ namespace EntityDomain
 
         private float _age;
         private CreatureGender _gender;
+        private Vector3 _moveDirection;
 
         // ---- [++] Genes [++] ----
         private Chromosome _chromosome;
@@ -47,16 +49,24 @@ namespace EntityDomain
         private float _geneSensorialSmell;
         private float _geneSensorialSight;
         private float _geneFoodPreference;
+        private float _geneBehaviour;
         // ---- [--] Genes [--] ----
+
+        private float _animationElapsedTime;
+        private Vector3 _animationStartPos;
+        private Vector3 _animationEndPos;
+        private bool _isAnimating;
         // #### [--] Attributes [--] ####
 
 
         // #### [++] Initialization [++] ####
         public Creature(int2 newCoordinates) : base(newCoordinates)
         {
+            this._animationElapsedTime = 0;
             this._time = 0;
             this._randomInterval = randomizeInterval(EntityConfig.instance.UpdateIntervalOfCreatureBrain);
             
+            initializeMoveDirection();
             initializeCreatureObject();
             initializeRandomGender();
             initializeRandomAge();
@@ -68,13 +78,16 @@ namespace EntityDomain
             Creature.creatureCounter++;
         }
 
+        private void initializeMoveDirection()
+        {
+            this._moveDirection = new Vector3(UnityEngine.Random.Range(-1,1), UnityEngine.Random.Range(-1,1), 0);
+        }
         private void initializeCreatureObject()
         {
             this._creatureObject = new GameObject("[Creature" + Creature.creatureCounter + "]");
             this._creatureObject.AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.creature_default;
-            this._creatureObject.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 1);      // black color
+            this._creatureObject.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f, 1.0f);      // black color
         }
-
         private void initializeRandomGender()
         {
             int gender = UnityEngine.Random.Range(0,1);
@@ -97,17 +110,19 @@ namespace EntityDomain
                                                 //               Energy consumption
                                                 //     less       |    default   |    more
 
-            this._geneMotorSpeed = 1.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
-            this._geneBrainSpeed = 1.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
-            this._geneSensorialSmell = 1.0f;    // -1.0 worst     | 0.0 default  | 1.0 best
-            this._geneSensorialSight = 1.0f;    // -1.0 worst     | 0.0 default  | 1.0 best
+            this._geneMotorSpeed = -1.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
+            this._geneBrainSpeed = -1.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
+            this._geneSensorialSmell = 0.0f;    // -1.0 worst     | 0.0 default  | 1.0 best
+            this._geneSensorialSight = 0.0f;    // -1.0 worst     | 0.0 default  | 1.0 best
             this._geneFoodPreference = 0.0f;    // -1.0 carnivore | 0.0 omnivore | 1.0 erbivore
+            this._geneBehaviour = 0.0f;         // -1.0 bad       | 0.0 both     | 1.0 good
 
             this._chromosome.addGene(this._geneMotorSpeed);         // 0 MOTOR SPEED
             this._chromosome.addGene(this._geneBrainSpeed);         // 1 BRAIN SPEED
             this._chromosome.addGene(this._geneSensorialSmell);     // 2 SMELL
             this._chromosome.addGene(this._geneSensorialSight);     // 3 SIGHT
             this._chromosome.addGene(this._geneFoodPreference);     // 4 FOOD PREFERENCE
+            this._chromosome.addGene(this._geneBehaviour);          // 5 BEHAVIOUR
         }
         // #### [--] Initialization [--] ####
 
@@ -117,18 +132,25 @@ namespace EntityDomain
         // this updating method might not wait for currently active action to finish -> find a method -> maybe actuallty states
         public void updateBrain()
         {
-            executeEvery(this._randomInterval);
+            if (this._isAnimating)
+            {
+                animate();
+            }
+            else
+            {
+                executeEvery(this._randomInterval);
+            }
         }
         private void executeEvery(float seconds)
         {   // execute every given seconds
             this._time += Time.deltaTime;    // only increment if creature is idle
 
             if (this._time >= seconds)
-            {   
+            {
                 // put here what needs to be executed after given seconds
                 this._time = 0;
-                Debug.Log(this._creatureObject.name + " brain action after " + seconds + " seconds.");
-
+                // Debug.Log(this._creatureObject.name + " brain action after " + seconds + " seconds.");
+                Debug.Log(this._creatureObject.name + " brain update after " + seconds + " seconds");
                 if (this._brainState == BrainState.Idle)
                 {   
                     // creature is not doing anything
@@ -148,7 +170,7 @@ namespace EntityDomain
             // should add a modifier (genetics) to change the randomize interval to
             // make the creature "smarter" by thinking faster for each individual
             // return UnityEngine.Random.Range(seconds/2 - this._chromosome.getGenes()[1]/4, seconds*2 - this._chromosome.getGenes()[1]/4);
-            return UnityEngine.Random.Range(seconds/2, seconds*2);
+            return UnityEngine.Random.Range(seconds/1.35f - this._geneBrainSpeed*(0.9f) * seconds/1.35f, seconds*1.35f - this._geneBrainSpeed*(0.9f) * seconds *1.35f);
         }
         // #### [--] Brain [--] ####
 
@@ -162,12 +184,32 @@ namespace EntityDomain
         {
             return this._creatureObject;
         }
+
+        public int getSightDistance()
+        {
+            return (int)(this._geneSensorialSight + EntityConfig.instance.SightDistanceInCells); // gene modifier * default sight distance
+        }
+
+        /*public float getMoveDuration()
+        {
+            return EntityConfig.instance.MoveDuration + this._geneMotorSpeed/1.25f;
+        }*/
+
+        public Vector3 getMoveDirection()
+        {
+            return this._moveDirection;
+        }
+        public void setMoveDirection(Vector3 newMoveDirection)
+        {
+            this._moveDirection = newMoveDirection;
+        }
         // #### [--] Getters & Setters [--] ####
 
 
         // #### [++] Behaviour [++] ####
         protected void act()
         {
+            Debug.Log(this._creatureObject.name + " state: " + this._state.ToString());
             switch(this._state)
             {
                 case CreatureState.None:
@@ -175,9 +217,16 @@ namespace EntityDomain
                     break;
                 case CreatureState.Thinking:
                     // checks what does it need
+                    List<LivingEntity> visibleEntities = checkSight();
+                    this._state = CreatureState.Exploring;
+                    
                     break;
                 case CreatureState.Exploring:
                     // moves one cell then resets to thinking
+                    explore();
+                    startAnimateTo(this.getCoordinates());
+                    
+                    this._state = CreatureState.Thinking;
                     break;
                 case CreatureState.GoingToEat:
                     // moves to food one cell then resets to thinking
@@ -207,11 +256,56 @@ namespace EntityDomain
             this._brainState = BrainState.Idle; // action finished
         }
 
+
+        private List<LivingEntity> checkSight()
+        {
+            return GridMap.currentGridInstance.getVisibleEntities(this);
+        }
+        private void explore()
+        {   
+            GridMap.currentGridInstance.moveCreature(this.getCoordinates(), this._moveDirection);
+        }
+
         protected override void eat(LivingEntity entity)
         {
             // TO DO
         }
         // #### [--] Behaviour [--] ####
+
+        private void startAnimateTo(int2 coordinates)
+        {
+            this._animationStartPos = this._creatureObject.transform.localPosition;
+            this._animationEndPos = gridToWorldCoordinates(coordinates);
+            this._isAnimating = true;
+        }
+        private void animate()
+        {
+            int2 worldToGridCoords = GridMap.currentGridInstance.worldToGridCoordinates(this._creatureObject.transform.localPosition);
+            
+            // animating
+            animateMovement();
+            // finished animating
+            if (this._animationElapsedTime >= 1)
+            {
+                this._time = 0; // reset brain timer
+                this._isAnimating = false;
+                this._animationElapsedTime = 0;
+            }
+        }
+        private void animateMovement()
+        {
+            this._animationElapsedTime = Mathf.Min(1, this._animationElapsedTime + Time.deltaTime * EntityConfig.instance.MoveSpeed + Time.deltaTime * this._geneMotorSpeed * 1.5f);
+            this._creatureObject.transform.localPosition = Vector3.Lerp(this._animationStartPos, this._animationEndPos, this._animationElapsedTime);
+        }
+
+        public Vector3 gridToWorldCoordinates()
+        {
+            return new Vector3(this.getCoordinates().x * GameConfigDomain.GameConfig.instance.GridCellSize, this.getCoordinates().y * GameConfigDomain.GameConfig.instance.GridCellSize, this._creatureObject.transform.localPosition.z);
+        }
+        public Vector3 gridToWorldCoordinates(int2 coordinates)
+        {
+            return new Vector3(coordinates.x * GameConfigDomain.GameConfig.instance.GridCellSize, coordinates.y * GameConfigDomain.GameConfig.instance.GridCellSize, this._creatureObject.transform.localPosition.z);
+        }
     }
 
 }

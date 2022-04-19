@@ -7,6 +7,10 @@ namespace GridDomain
 {
     public class NullTile : Tile
     {   // TO DO : ERROR : USING IT CREATES LOTS OF EMPTY OBJECTS
+
+
+
+    
         // #### [++] Constructor [++] ####
         public NullTile() : base(GridTileSet_AssetService.instance.tile_default, new int2(0,0)) {}
         // #### [--]] Constructor [--] ####
