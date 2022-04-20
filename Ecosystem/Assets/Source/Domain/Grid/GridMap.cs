@@ -35,6 +35,7 @@ namespace GridDomain
             setRowsNumber(rows);
             setColsNumber(cols);
             setCellSize(cellSize);
+            positionTo(getCenter());
             ConstructGridArray();
             addRandomCreatures();
             GridMap.currentGridInstance = this;
@@ -69,8 +70,9 @@ namespace GridDomain
             }
         }
 
-        private void addRandomCreatures()
+        public void addRandomCreatures()
         {
+            Debug.Log("Spawning creatures...");
             Creature newCreature;
             for (int col = 0; col < gridArray.GetLength(0); col++)
             {
@@ -79,7 +81,6 @@ namespace GridDomain
                     int doSpawn = UnityEngine.Random.Range(1, GameConfig.instance.SpawnEntityProbability);
                     if (doSpawn == 1)
                     {
-                        Debug.Log("Spawning creature...");
                         newCreature = new Creature(new int2(col, row));
 
                         Transform newCreatureTransform = newCreature.getObject().transform;
@@ -179,15 +180,11 @@ namespace GridDomain
         // #### [++] Methods [++] ####
         public void updateCreatures()
         {
-            /*foreach(Creature creature in this._creatures)
-            {
-                creature.updateBrain();
-            }*/
             if (this.gridArray != null)
             {
                 foreach(Cell cell in this.gridArray)
                 {
-                    if(cell.getEntity().GetType().BaseType == typeof(LivingEntity))
+                    if(cell.getEntity().GetType().IsSubclassOf(typeof(LivingEntity)))
                     {   // if cell contains a living entity, consume its energy by the configured amount in GameConfig
                         Creature foundLivingEntity = (Creature)cell.getEntity();
                         foundLivingEntity.updateBrain();
@@ -197,21 +194,37 @@ namespace GridDomain
         }
         public void consumeAllCreaturesEnergy(float amount)
         {
-            /*foreach(LivingEntity creature in this._creatures)
-            {
-                creature.addEnergy(amount);
-            }*/
             if (this.gridArray != null)
             {
                 foreach(Cell cell in this.gridArray)
                 {
-                    if(cell.getEntity().GetType() == typeof(LivingEntity))
+                    if(cell.getEntity().GetType().IsSubclassOf(typeof(LivingEntity)))
                     {   // if cell contains a living entity, consume its energy by the configured amount in GameConfig
                         LivingEntity foundLivingEntity = (LivingEntity)cell.getEntity();
-                        foundLivingEntity.addEnergy(amount);
+                        foundLivingEntity.modifyEnergyBy(amount);
                     }
                 }
             }
+        }
+        public void destroyDeadEntities()
+        {
+            if (this.gridArray != null)
+            {
+                Debug.Log("dead body collection started...");
+                foreach(Cell cell in this.gridArray)
+                {
+                    if(cell.getEntity().GetType().IsSubclassOf(typeof(LivingEntity)))
+                    {   // if cell contains a living entity, consume its energy by the configured amount in GameConfig
+                        LivingEntity foundLivingEntity = (LivingEntity)cell.getEntity();
+                        if (!foundLivingEntity.isAlive())
+                        {
+                            Debug.Log("dead body collected.");
+                            cell.setEntity(new NullEntity());
+                        }
+                    }
+                }
+            }
+            Debug.Log("dead body collection ended..");
         }
 
         public List<LivingEntity> getVisibleEntities(Creature askingEntity)
@@ -292,33 +305,61 @@ namespace GridDomain
             );
         }*/
 
-        public Vector3 rotate(Vector3 vector, float degrees)
+        private Vector3 rotate(Vector3 vector, float degrees)
+        {   // dont think it works properly
+            float vectorDegrees = CalculateAngle(vector, Vector3.right); // calculate the angle between this vector and world 0 rotation
+            float newVectorDegrees = vectorDegrees;
+            
+            if (GameConfig.instance.Debugging)
+            {
+                Debug.Log("direction degrees: " + vectorDegrees);
+            }
+            
+            if (vectorDegrees + degrees >= 360)
+            {
+                newVectorDegrees = vectorDegrees + degrees - 360;
+            }
+            if (vectorDegrees + degrees <= 0)
+            {
+                newVectorDegrees = Mathf.Abs(vectorDegrees + degrees);
+            }
+            return Quaternion.Euler(0, 0, newVectorDegrees) * vector;
+        }
+        private float CalculateAngle(Vector3 from, Vector3 to)
         {
-            return Quaternion.Euler(0, 0, degrees) * vector;
+            //return Quaternion.FromToRotation(Vector3.up, to - from).eulerAngles.z;
+            float angle = Vector3.Angle(from, to);
+            return (Vector3.Angle(Vector3.left, to) > 90f) ? 360f - angle : angle;   
         }
 
         private int2 getNextCellVector(int2 creatureCoordinates, Vector3 moveDirection)
         {
             // TO DO : NOT CHANGING DIRECTION ENOUGH
-            float alphaDegrees = UnityEngine.Random.Range(-80, 80);
+            float alphaDegrees = UnityEngine.Random.Range(-90, 90);
             moveDirection = rotate(moveDirection, alphaDegrees);
+
+            if (GameConfig.instance.Debugging)
+            {
+                Debug.Log("move Direction Vector: " + moveDirection);
+            }
 
             //Redo:
             int2 adiacentDirection = directionVector2ToInt(moveDirection);
             int2 nextCellCoordinates = creatureCoordinates + adiacentDirection;
 
-            Redo:
+            //Redo:
             if (!isInBounds(nextCellCoordinates))
             {   // not in bounds
-                nextCellCoordinates = getRandomNextCell(creatureCoordinates);
+                nextCellCoordinates = getNextCellRaw(creatureCoordinates);
+                moveDirection = rotate(moveDirection, 180);
 
-                goto Redo;
+                //goto Redo;
             }
             if (!isCellFree(gridArray[nextCellCoordinates.x, nextCellCoordinates.y]))
             {   // not free
-                nextCellCoordinates = getRandomNextCell(creatureCoordinates);
-
-                goto Redo;
+                nextCellCoordinates = getNextCellRaw(creatureCoordinates);
+                moveDirection = rotate(moveDirection, 180);
+                //goto Redo;
             }
             return nextCellCoordinates;
         }

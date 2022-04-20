@@ -4,39 +4,20 @@ using UnityEngine;
 using Unity.Mathematics;
 using GeneticsDomain;
 using GridDomain;
+using GameConfigDomain;
 
 namespace EntityDomain
 {
-    public enum BrainState
-    {
-        Idle,
-        Busy
-    }
-    public enum CreatureState 
-    {   // to be moved in a separate file
-        None,
-        Thinking,
-        Exploring,
-        GoingToEat,
-        Eating,
-        GoingToDrink,
-        Drinking,
-        Hunting,
-        Fleeing,
-        GoingToMate,
-        Mating
-    }
-
     public class Creature : LivingEntity
     {
         // #### [++] Attributes [++] ####
         public static int creatureCounter = 0;
-        private GameObject _creatureObject = null;
+        //private GameObject _creatureObject = null;
 
         private float _time;
         private float _randomInterval;
         private BrainState _brainState;
-        private CreatureState _state;
+        private CreatureState _physicalState;
 
         private float _age;
         private CreatureGender _gender;
@@ -63,34 +44,54 @@ namespace EntityDomain
         public Creature(int2 newCoordinates) : base(newCoordinates)
         {
             this._animationElapsedTime = 0;
-            this._time = 0;
             this._randomInterval = randomizeInterval(EntityConfig.instance.UpdateIntervalOfCreatureBrain);
+            this._time = UnityEngine.Random.Range(-this._randomInterval, this._randomInterval);
             
+            initializeStates();
             initializeMoveDirection();
-            initializeCreatureObject();
             initializeRandomGender();
+            initializeCreatureObject(this._gender);
             initializeRandomAge();
             initializeDefaultGenes();
-
-            this._brainState = BrainState.Idle;
-            this._state = CreatureState.None;
 
             Creature.creatureCounter++;
         }
 
+        private void initializeStates()
+        {
+            this._physicalState = CreatureState.None;
+            this._brainState = BrainState.Idle;
+        }
         private void initializeMoveDirection()
         {
             this._moveDirection = new Vector3(UnityEngine.Random.Range(-1,1), UnityEngine.Random.Range(-1,1), 0);
         }
         private void initializeCreatureObject()
         {
-            this._creatureObject = new GameObject("[Creature" + Creature.creatureCounter + "]");
+            /*this._creatureObject = new GameObject("[Creature" + Creature.creatureCounter + "]");
             this._creatureObject.AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.creature_default;
             this._creatureObject.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f, 1.0f);      // black color
+            */
+            this.setObject(new GameObject("[Creature" + Creature.creatureCounter + "]"));
+            this.getObject().AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.creature_default;
+            this.getObject().GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f, 1.0f);      // black color
+        }
+        private void initializeCreatureObject(CreatureGender gender)
+        {
+            this.setObject(new GameObject("[Creature" + Creature.creatureCounter + "]"));
+            if (gender == CreatureGender.Male)
+            {
+                this.getObject().AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.creature_male;
+            }
+            else    // Female
+            {
+                this.getObject().AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.creature_female;
+            }
+            this.getObject().GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f, 1.0f);      // black color
         }
         private void initializeRandomGender()
         {
-            int gender = UnityEngine.Random.Range(0,1);
+            int gender = UnityEngine.Random.Range(0,2);
             if (gender == 0)
             {
                 this._gender = CreatureGender.Male;
@@ -110,8 +111,8 @@ namespace EntityDomain
                                                 //               Energy consumption
                                                 //     less       |    default   |    more
 
-            this._geneMotorSpeed = -1.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
-            this._geneBrainSpeed = -1.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
+            this._geneMotorSpeed = 0.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
+            this._geneBrainSpeed = 0.0f;        // -1.0 slowest   | 0.0 default  | 1.0 fastest
             this._geneSensorialSmell = 0.0f;    // -1.0 worst     | 0.0 default  | 1.0 best
             this._geneSensorialSight = 0.0f;    // -1.0 worst     | 0.0 default  | 1.0 best
             this._geneFoodPreference = 0.0f;    // -1.0 carnivore | 0.0 omnivore | 1.0 erbivore
@@ -132,37 +133,48 @@ namespace EntityDomain
         // this updating method might not wait for currently active action to finish -> find a method -> maybe actuallty states
         public void updateBrain()
         {
-            if (this._isAnimating)
+            if (this.isAlive())
             {
-                animate();
-            }
-            else
-            {
-                executeEvery(this._randomInterval);
+                if (this._isAnimating)
+                {
+                    animate();
+                }
+                else
+                {
+                    executeEvery(this._randomInterval);
+                }
             }
         }
+        private void toBeExecutedEvery()
+        {
+            // put here what needs to be executed after given seconds
+            if (this._brainState == BrainState.Idle)
+            {   
+                // creature is not doing anything
+                this._brainState = BrainState.Busy;   // Creature is doing something
+                this._randomInterval = randomizeInterval(EntityConfig.instance.UpdateIntervalOfCreatureBrain);
+                act();
+            }
+            else if (this._brainState == BrainState.Busy)
+            {
+                // creature is doing something
+                // TO DO : check if attacked or if there are predators nearby
+            }
+        }
+
         private void executeEvery(float seconds)
         {   // execute every given seconds
             this._time += Time.deltaTime;    // only increment if creature is idle
 
             if (this._time >= seconds)
             {
-                // put here what needs to be executed after given seconds
                 this._time = 0;
-                // Debug.Log(this._creatureObject.name + " brain action after " + seconds + " seconds.");
-                Debug.Log(this._creatureObject.name + " brain update after " + seconds + " seconds");
-                if (this._brainState == BrainState.Idle)
-                {   
-                    // creature is not doing anything
-                    this._brainState = BrainState.Busy;   // Creature is doing something
-                    this._randomInterval = randomizeInterval(EntityConfig.instance.UpdateIntervalOfCreatureBrain);
-                    act();
-                }
-                else if (this._brainState == BrainState.Busy)
+                if (GameConfig.instance.Debugging)
                 {
-                    // creature is doing something
-                    // TO DO : check if attacked or if there are predators nearby
+                    Debug.Log(this.getObject().name + " brain update after " + seconds + " seconds");
+                    Debug.Log(this.getObject().name + " Energy: " + this.getEnergy());
                 }
+                toBeExecutedEvery();
             }
         }
         private float randomizeInterval(float seconds)
@@ -180,11 +192,6 @@ namespace EntityDomain
         {
             return this._gender;
         }
-        public GameObject getObject()
-        {
-            return this._creatureObject;
-        }
-
         public int getSightDistance()
         {
             return (int)(this._geneSensorialSight + EntityConfig.instance.SightDistanceInCells); // gene modifier * default sight distance
@@ -209,24 +216,29 @@ namespace EntityDomain
         // #### [++] Behaviour [++] ####
         protected void act()
         {
-            Debug.Log(this._creatureObject.name + " state: " + this._state.ToString());
-            switch(this._state)
+            if (GameConfig.instance.Debugging)
+            {
+                Debug.Log(this.getObject().name + " state: " + this._physicalState.ToString());
+            }
+
+            switch(this._physicalState)
             {
                 case CreatureState.None:
-                    this._state = CreatureState.Thinking;
+                    this._physicalState = CreatureState.Thinking;
                     break;
                 case CreatureState.Thinking:
                     // checks what does it need
                     List<LivingEntity> visibleEntities = checkSight();
-                    this._state = CreatureState.Exploring;
-                    
+                    this._physicalState = CreatureState.Exploring;
+                    consumeEnergy(CreatureActions.Think);
                     break;
                 case CreatureState.Exploring:
                     // moves one cell then resets to thinking
                     explore();
                     startAnimateTo(this.getCoordinates());
+                    consumeEnergy(CreatureActions.Move);
                     
-                    this._state = CreatureState.Thinking;
+                    this._physicalState = CreatureState.Thinking;
                     break;
                 case CreatureState.GoingToEat:
                     // moves to food one cell then resets to thinking
@@ -274,13 +286,13 @@ namespace EntityDomain
 
         private void startAnimateTo(int2 coordinates)
         {
-            this._animationStartPos = this._creatureObject.transform.localPosition;
+            this._animationStartPos = this.getObject().transform.localPosition;
             this._animationEndPos = gridToWorldCoordinates(coordinates);
             this._isAnimating = true;
         }
         private void animate()
         {
-            int2 worldToGridCoords = GridMap.currentGridInstance.worldToGridCoordinates(this._creatureObject.transform.localPosition);
+            int2 worldToGridCoords = GridMap.currentGridInstance.worldToGridCoordinates(this.getObject().transform.localPosition);
             
             // animating
             animateMovement();
@@ -295,16 +307,16 @@ namespace EntityDomain
         private void animateMovement()
         {
             this._animationElapsedTime = Mathf.Min(1, this._animationElapsedTime + Time.deltaTime * EntityConfig.instance.MoveSpeed + Time.deltaTime * this._geneMotorSpeed * 1.5f);
-            this._creatureObject.transform.localPosition = Vector3.Lerp(this._animationStartPos, this._animationEndPos, this._animationElapsedTime);
+            this.getObject().transform.localPosition = Vector3.Lerp(this._animationStartPos, this._animationEndPos, this._animationElapsedTime);
         }
 
         public Vector3 gridToWorldCoordinates()
         {
-            return new Vector3(this.getCoordinates().x * GameConfigDomain.GameConfig.instance.GridCellSize, this.getCoordinates().y * GameConfigDomain.GameConfig.instance.GridCellSize, this._creatureObject.transform.localPosition.z);
+            return new Vector3(this.getCoordinates().x * GameConfigDomain.GameConfig.instance.GridCellSize, this.getCoordinates().y * GameConfigDomain.GameConfig.instance.GridCellSize, this.getObject().transform.localPosition.z);
         }
         public Vector3 gridToWorldCoordinates(int2 coordinates)
         {
-            return new Vector3(coordinates.x * GameConfigDomain.GameConfig.instance.GridCellSize, coordinates.y * GameConfigDomain.GameConfig.instance.GridCellSize, this._creatureObject.transform.localPosition.z);
+            return new Vector3(coordinates.x * GameConfigDomain.GameConfig.instance.GridCellSize, coordinates.y * GameConfigDomain.GameConfig.instance.GridCellSize, this.getObject().transform.localPosition.z);
         }
     }
 

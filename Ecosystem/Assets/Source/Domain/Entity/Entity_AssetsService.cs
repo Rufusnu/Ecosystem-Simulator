@@ -17,6 +17,8 @@ namespace EntityDomain
 
         // ### [++] Sprite List [++] ###
         public Sprite creature_default;
+        public Sprite creature_female;
+        public Sprite creature_male;
         // ### [--] Sprite List [--] ###
     }
 }

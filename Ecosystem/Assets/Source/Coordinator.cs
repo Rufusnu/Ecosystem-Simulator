@@ -33,20 +33,22 @@ public class Coordinator : MonoBehaviour
     void Update()
     {
         this.grid.updateCreatures();
-        executeEvery(GameConfig.instance.UpdateIntervalOfEnergySystem);
+        executeEvery(EnergySystem.UpdateIntervalOfEnergySystem);
     }
-
     private void executeRepeatableFunctions()
     {
         // Energy System
         EnergySystem.executeUpdate();
+        
+        // entities collector
+        this.grid.destroyDeadEntities();
     }
 
     private void executeEvery(float seconds)
     {
         // execute what needs to be executed every [updateInterval_EnergySystem] seconds
         this._time += Time.deltaTime;
-        if (this._time >= GameConfig.instance.UpdateIntervalOfEnergySystem)
+        if (this._time >= EnergySystem.UpdateIntervalOfEnergySystem)
         {
             executeRepeatableFunctions();
             this._time = 0;
@@ -58,7 +60,6 @@ public class Coordinator : MonoBehaviour
     {
         try {
             this.grid = new GridMap(GameConfig.instance.GridRows, GameConfig.instance.GridColumns, GameConfig.instance.GridCellSize);
-            this.grid.positionTo(this.grid.getCenter());
         } catch (System.Exception exception) {
             Debug.Log("Error: " + exception);
         }

@@ -13,6 +13,9 @@ namespace GameConfigDomain
         }
 
         // ### [++] Config List [++] ###
+        public bool Debugging = false;
+        public bool Debugging_EnergySystem = false;
+
         // ---- [++] Grid [++] ---- 
         public int GridRows = 8; // default
         public int GridColumns = 8; // default
@@ -21,8 +24,6 @@ namespace GameConfigDomain
 
 
         // ---- [++] Coordinator [++] ----
-        public float UpdateIntervalOfEnergySystem = 3.0f; // default 3 seconds
-        public float EnergyConsumedOnUpdateEnergySystem = 0.05f;
         public int SpawnEntityProbability = 40; // spawn 1 every [SpawnEntityProbability] tiles
         // ---- [--] Coordinator [--] ----
         // ### [--] Config List [--] ###

@@ -10,6 +10,7 @@ namespace EntityDomain
         // #### [++] Attributes [++] ####
         public static int entityCounter = 0;
         private int2 _coordinates;
+        private GameObject _object = null;
         // #### [--] Attributes [--] ####
 
 
@@ -30,6 +31,14 @@ namespace EntityDomain
         public virtual void setCoordinates(int2 newCoordinates)
         {
             this._coordinates = newCoordinates;
+        }
+        public GameObject getObject()
+        {
+            return this._object;
+        }
+        protected void setObject(GameObject newObject)
+        {
+            this._object = newObject;
         }
         // ---- [--] Coordinates [--] ---- 
         // #### [--] Getters & Setters [--] ####
