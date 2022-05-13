@@ -7,13 +7,13 @@ namespace GridDomain
 {
     public class Tile
     {
-        // #### [++] Attributes [++] ####
+        // #### #### [++] Attributes [++] #### ####
         private GameObject _tileObject = null; // Used to set Tile Sprite
         private SpriteRenderer _tileObjectSpriteRederer; // Tile Sprite
-        // #### [--] Attributes [--] ####
+        // #### #### [--] Attributes [--] #### ####
 
 
-        // #### [++] Constructor [++] ####
+        // #### #### [++] Constructor [++] #### ####
         public Tile(Sprite newSprite, int2 coordinates)
         {
             if (newSprite == null)
@@ -27,10 +27,10 @@ namespace GridDomain
             this._tileObjectSpriteRederer = this._tileObject.AddComponent<SpriteRenderer>();
             setSprite(newSprite);
         }
-        // #### [--]] Constructor [--] ####
+        // #### #### [--]] Constructor [--] #### ####
 
 
-        // #### [++] Getters & Setters [++] ####
+        // #### #### [++] Getters & Setters [++] #### ####
         // ---- [++] Sprite [++] ---- 
         public virtual void setSprite(Sprite newSprite)
         {
@@ -75,6 +75,6 @@ namespace GridDomain
             return this._tileObject.name;
         }
         // ---- [--] Tile Object Name [--] ---- 
-        // #### [++] Getters & Setters [++] ####
+        // #### #### [++] Getters & Setters [++] #### ####
     }
 }

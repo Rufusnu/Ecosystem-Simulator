@@ -7,22 +7,22 @@ namespace EntityDomain
 {
     public abstract class Entity
     {
-        // #### [++] Attributes [++] ####
+        // #### #### [++] Attributes [++] #### ####
         public static int entityCounter = 0;
         private int2 _coordinates;
         private GameObject _object = null;
-        // #### [--] Attributes [--] ####
+        // #### #### [--] Attributes [--] #### ####
 
 
-        // #### [++] Initialization [++] ####
+        // #### #### [++] Initialization [++] #### ####
         public Entity(int2 newCoordinates)
         {
             setCoordinates(newCoordinates);
         }
-        // #### [--] Initialization [--] ####
+        // #### #### [--] Initialization [--] #### ####
 
 
-        // #### [++] Getters & Setters [++] ####
+        // #### #### [++] Getters & Setters [++] #### ####
         // ---- [++] Coordinates [++] ---- 
         public virtual int2 getCoordinates()
         {
@@ -41,6 +41,6 @@ namespace EntityDomain
             this._object = newObject;
         }
         // ---- [--] Coordinates [--] ---- 
-        // #### [--] Getters & Setters [--] ####
+        // #### #### [--] Getters & Setters [--] #### ####
     }
 }

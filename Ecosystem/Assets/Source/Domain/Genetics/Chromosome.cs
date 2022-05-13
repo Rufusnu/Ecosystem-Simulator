@@ -1,26 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using EntityDomain;
 
 namespace GeneticsDomain
 {
     public class Chromosome
     {
-        // #### [++] Attributes [++] ####
+        // #### #### [++] Attributes [++] #### ####
         private List<float> _genes = new List<float>();
         private int _genesCount;
-        // #### [--] Attributes [--] ####
+        // #### #### [--] Attributes [--] #### ####
 
 
-        // #### [++] Constructor [++] ####
+        // #### #### [++] Constructor [++] #### ####
         public Chromosome()
         {
             this._genesCount = 0;
         }
-        // #### [--] Constructor [--] ####
+        // #### #### [--] Constructor [--] #### ####
 
 
-        // #### [++] Getters & Setters [++] ####
+        // #### #### [++] Getters & Setters [++] #### ####
         // ---- [++] Genes [++] ---- 
         public List<float> getGenes()
         {
@@ -43,10 +44,10 @@ namespace GeneticsDomain
             return this._genesCount;
         }
         // ---- [--] Genes [--] ----
-        // #### [--] Getters & Setters [--] ####
+        // #### #### [--] Getters & Setters [--] #### ####
 
 
-        // #### [++] Behaviour [++] ####
+        // #### #### [++] Behaviour [++] #### ####
         // ---- [++] Genes Inheritance [++] ---- 
         public void inheritGenes(Chromosome parentMaleChromosome, Chromosome parentFemaleChromosome)
         {
@@ -107,6 +108,6 @@ namespace GeneticsDomain
             return mutatedGene;
         }
         // ---- [--] Genes Inheritance [--] ---- 
-        // #### [--] Behaviour [--] ####
+        // #### #### [--] Behaviour [--] #### ####
     }
 }

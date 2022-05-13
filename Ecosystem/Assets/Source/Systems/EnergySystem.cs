@@ -11,14 +11,14 @@ namespace Energy
     {
         // Responsable for every LivingEntity energy changes
 
-        // #### [++] Attributes [++] ####
+        // #### #### [++] Attributes [++] #### ####
         public static float defaultEnergyValue = 0.8f; // 80%
         public static float UpdateIntervalOfEnergySystem = 3.0f; // default 3 seconds
         public static float EnergyConsumedOnUpdateEnergySystem = -0.01f;
-        public static float MoveConsumption = -0.05f;
-        public static float ThinkConsumption = -0.02f;
+        public static float MoveConsumption = -0.02f;
+        public static float ThinkConsumption = -0.01f;
 
-        // #### [--] Attributes [--] ####
+        // #### #### [--] Attributes [--] #### ####
 
 
         // methods to be implemented
@@ -29,6 +29,11 @@ namespace Energy
                 Debug.Log("Energy System Update");
             }
             GridMap.currentGridInstance.consumeAllCreaturesEnergy(EnergyConsumedOnUpdateEnergySystem);
+        }
+
+        public static float kcalToEnergy(float kcal)
+        {
+            return kcal/EntityConfig.instance.maxKcalEnergy;
         }
     }
 }

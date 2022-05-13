@@ -14,25 +14,26 @@ namespace EntityDomain
         
         // can send signals to energy system and energy system decides what to do with this object's energy levels
 
-        // #### [++] Attributes [++] ####
+        // #### #### [++] Attributes [++] #### ####
         public static int livingEntityCounter = 0;
         private Chromosome _chromosome;
         private float _energy;
+        protected float _nutritionValue;
         protected LivingState _livingState;
-        // #### [--] Attributes [--] ####
+        // #### #### [--] Attributes [--] #### ####
 
 
-        // #### [++] Initialization [++] ####
+        // #### #### [++] Initialization [++] #### ####
         public LivingEntity(int2 newCoordinates) : base(newCoordinates)
         {
             LivingEntity.livingEntityCounter++;
             this._energy = EnergySystem.defaultEnergyValue;
             this._livingState = LivingState.Alive;
         }
-        // #### [--] Initialization [--] ####
+        // #### #### [--] Initialization [--] #### ####
 
         
-        // #### [++] Getters & Setters [++] ####
+        // #### #### [++] Getters & Setters [++] #### ####
         // ---- [++] Energy [++] ---- 
         public void setEnergy(float newEnergy)
         {
@@ -64,6 +65,13 @@ namespace EntityDomain
         }
         // ---- [--] Energy [--] ----
 
+        // ---- [++] Nutrition [++] ----
+        public float getNutrition()
+        {
+            return this._nutritionValue;
+        }
+        // ---- [--] Nutrition [--] ----
+
         public LivingState getLivingState()
         {
             return this._livingState;
@@ -76,10 +84,10 @@ namespace EntityDomain
             }
             return false;
         }
-        // #### [--] Getters & Setters [--] ####
+        // #### #### [--] Getters & Setters [--] #### ####
 
 
-        // #### [++] Behaviour [++] ####
+        // #### #### [++] Behaviour [++] #### ####
         protected void die()
         {
             if (this.isAlive())
@@ -94,6 +102,8 @@ namespace EntityDomain
             }
         }
         protected abstract void eat(LivingEntity entity); // to be implemented by Plants and Creatures
-        // #### [--] Behaviour [--] ####
+        public abstract void eaten();
+        protected abstract void initializeNutritionValue();
+        // #### #### [--] Behaviour [--] #### ####
     }
 }

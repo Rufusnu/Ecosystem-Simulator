@@ -28,7 +28,7 @@ public class Coordinator : MonoBehaviour
         drawGrid();
     }
 
-    // #### [++] Updates [++] ####
+    // #### #### [++] Updates [++] #### ####
     // Update is called once per frame
     void Update()
     {
@@ -42,6 +42,7 @@ public class Coordinator : MonoBehaviour
         
         // entities collector
         this.grid.destroyDeadEntities();
+        this.grid.spawnRandomPlants();
     }
 
     private void executeEvery(float seconds)
@@ -54,7 +55,7 @@ public class Coordinator : MonoBehaviour
             this._time = 0;
         }
     }
-    // #### [--] Updates [--] ####
+    // #### #### [--] Updates [--] #### ####
 
     private void drawGrid()
     {

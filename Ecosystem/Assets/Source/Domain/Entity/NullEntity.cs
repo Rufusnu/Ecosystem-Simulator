@@ -7,12 +7,12 @@ namespace EntityDomain
 {
     public sealed class NullEntity : Entity
     {
-        // #### [++] Initialization [++] ####
+        // #### #### [++] Initialization [++] #### ####
         public NullEntity() : base(new int2(0, 0))  {}
-        // #### [--] Initialization [--] ####
+        // #### #### [--] Initialization [--] #### ####
 
 
-        // #### [++] Getters & Setters [++] ###
+        // #### #### [++] Getters & Setters [++] ###
         // ---- [++] Coordinates [++] ---- 
         public override int2 getCoordinates()
         {
@@ -20,6 +20,6 @@ namespace EntityDomain
         }
         public override void setCoordinates(int2 newCoordinates) {}
         // ---- [--] Coordinates [--] ---- 
-        // #### [--] Getters & Setters [--] ####
+        // #### #### [--] Getters & Setters [--] #### ####
     }
 }

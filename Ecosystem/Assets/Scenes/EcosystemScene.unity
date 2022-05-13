@@ -279,7 +279,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.11320752, g: 0.11320752, b: 0.11320752, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -466,10 +466,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MutationFactor: 0.05
+  maxKcalEnergy: 3000
   UpdateIntervalOfCreatureBrain: 0.5
   SightDistanceInCells: 2
   MoveDuration: 1
   MoveSpeed: 3
+  minDeathAge: 60
+  maxDeathAge: 110
+  CreatureMinNutritionValue: 200
+  CreatureMaxNutritionValue: 300
+  PlantMinNutritionValue: 150
+  PlantMaxNutritionValue: 250
 --- !u!1 &1740101901
 GameObject:
   m_ObjectHideFlags: 0
@@ -516,6 +523,7 @@ MonoBehaviour:
   creature_default: {fileID: 7482667652216324306, guid: 7450b2c4666f5d444b9e5e28eed581e5, type: 3}
   creature_female: {fileID: 21300000, guid: 69830d2a68ecefa4cbec141da2b534d1, type: 3}
   creature_male: {fileID: 21300000, guid: 0995dece7be77c443918c407cda61df3, type: 3}
+  plant_default: {fileID: 21300000, guid: f586f505246c70d43bb47bd9dc0b2dc6, type: 3}
 --- !u!1 &1810067592
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,9 +567,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7a3668cbe1ab74899caf49cd2a58cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Debugging: 1
-  Debugging_EnergySystem: 1
+  Debugging: 0
+  Debugging_EnergySystem: 0
   GridRows: 27
   GridColumns: 48
   GridCellSize: 1.15
-  SpawnEntityProbability: 20
+  SpawnEntityProbability: 100
+  SpawnPlantProbability: 200

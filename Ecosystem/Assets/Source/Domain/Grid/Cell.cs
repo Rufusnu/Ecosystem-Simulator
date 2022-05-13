@@ -8,16 +8,16 @@ namespace GridDomain
 {
     public class Cell
     {
-        // #### [++] Attributes [++] ####
+        // #### #### [++] Attributes [++] #### ####
         private int2 _coordinates;
         private int _cellSize;
         private GameObject _cellObject = null;
         private Tile _tile = null;
         private Entity _entity = new NullEntity(); // what entity is on the cell; is it occupied? used for pathfinding
-        // #### [--] Attributes [--] #### 
+        // #### #### [--] Attributes [--] #### #### 
 
 
-        // #### [++] Constructor [++] ####
+        // #### #### [++] Constructor [++] #### ####
         public Cell()
         {
             this._coordinates = new int2(0, 0);
@@ -48,10 +48,10 @@ namespace GridDomain
         {   
             // might need some validation
         }
-        // #### [--] Constructor [--] ####
+        // #### #### [--] Constructor [--] #### ####
 
 
-        // #### [++] Getters & Setters [++] ####
+        // #### #### [++] Getters & Setters [++] #### ####
         // ---- [++] Coordinates [++] ---- 
         public int2 getCoordinates()
         {
@@ -110,10 +110,10 @@ namespace GridDomain
             return this._entity;
         }
         // ---- [--] Entity [--] ---- 
-        // #### [--] Getters & Setters [--] ####
+        // #### #### [--] Getters & Setters [--] #### ####
 
 
-        // #### [++] Utils [++] #### 
+        // #### #### [++] Utils [++] #### #### 
         private Vector3 getWorldPosition(int x, int y, float cellSize)
         {
             return new Vector3(x, y) * cellSize;
@@ -127,14 +127,14 @@ namespace GridDomain
             }
             return false;
         }
-        // #### [--] Utils [--] #### 
+        // #### #### [--] Utils [--] #### #### 
 
 
-        // #### [++] Overrides [++] #### 
+        // #### #### [++] Overrides [++] #### #### 
         public override string ToString()
         {
             return "Cell " + this._coordinates.ToString();
         }
-        // #### [--] Overrides [--] #### 
+        // #### #### [--] Overrides [--] #### #### 
     }
 }

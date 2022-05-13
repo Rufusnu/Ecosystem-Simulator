@@ -25,6 +25,7 @@ namespace GameConfigDomain
 
         // ---- [++] Coordinator [++] ----
         public int SpawnEntityProbability = 40; // spawn 1 every [SpawnEntityProbability] tiles
+        public int SpawnPlantProbability = 1000; // spawn 1 every [SpawnPlantProbability] tiles
         // ---- [--] Coordinator [--] ----
         // ### [--] Config List [--] ###
     }

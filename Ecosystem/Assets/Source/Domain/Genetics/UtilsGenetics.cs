@@ -20,7 +20,7 @@ namespace GeneticsDomain
             constructDictionary();
         }
 
-        // #### [++] Integer To Gender [++] ####
+        // #### #### [++] Integer To Gender [++] #### ####
         private Dictionary<int, string> gender; // used in <Chromosome> to make code easier to follow
         private void constructDictionary()
         {   // the dictionary translates int values 0,1 to human understandable values
@@ -31,7 +31,7 @@ namespace GeneticsDomain
         {
             return this.gender[integer];
         }
-        // #### [--] Integer To Gender [--] ####
+        // #### #### [--] Integer To Gender [--] #### ####
 
     }
 }
