@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Energy;
 using GridDomain;
-using GameConfigDomain;
 using EntityDomain;
 using Unity.Mathematics;
 
@@ -24,15 +23,16 @@ public class Coordinator : MonoBehaviour
     }
     void Start()
     {
+        Time.timeScale = Time.timeScale * Configs.GameSpeedMultiplier();
         this._time = 0;
         drawGrid();
     }
 
     // #### #### [++] Updates [++] #### ####
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        this.grid.updateCreatures();
+        this.grid.updateLivingEntitiesList();
         executeEvery(EnergySystem.UpdateIntervalOfEnergySystem);
     }
     private void executeRepeatableFunctions()
@@ -60,7 +60,7 @@ public class Coordinator : MonoBehaviour
     private void drawGrid()
     {
         try {
-            this.grid = new GridMap(GameConfig.instance.GridRows, GameConfig.instance.GridColumns, GameConfig.instance.GridCellSize);
+            this.grid = GridMap.createGridMap(Configs.GridRows(), Configs.GridColumns(), Configs.GridCellSize());
         } catch (System.Exception exception) {
             Debug.Log("Error: " + exception);
         }

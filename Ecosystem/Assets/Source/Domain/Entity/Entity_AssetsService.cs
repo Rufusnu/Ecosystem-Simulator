@@ -10,9 +10,14 @@ namespace EntityDomain
         // Used to store all sprites related to GridTileSet and make them easy and fast to access
 
         public static Entity_AssetsService instance; // make the instance visble and usable
+        private static bool _alive;
 
         private void Awake() {
-            instance = this;
+            if (_alive == false)
+            {
+                instance = this;
+                _alive = true;
+            }
         }
 
         // ### [++] Sprite List [++] ###

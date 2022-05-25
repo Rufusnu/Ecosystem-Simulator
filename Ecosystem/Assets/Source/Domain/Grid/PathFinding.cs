@@ -67,6 +67,8 @@ namespace PathFinding
 
     public class A_Star : PathFinder
     {
+        // Pathfinding using A* Algorithm
+        // without diagonals
         public override Queue<int2> findPathTo(int2 startCoordinate, int2 targetCoordinate, Cell[,] gridArray)
         {
             Queue<int2> path = new Queue<int2>();

@@ -39,6 +39,7 @@ namespace GridDomain
                 throw new System.Exception("<Tile>: Cannot set null sprite");
             }
             this._tileObjectSpriteRederer.sprite = newSprite;
+            this._tileObjectSpriteRederer.color = new Color(0.5f, 0.9f, 0.5f, 1.0f);
         }
         public virtual Sprite getSprite()
         {

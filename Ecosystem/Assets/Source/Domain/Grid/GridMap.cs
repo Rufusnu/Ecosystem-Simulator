@@ -1,17 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Utils;
 using Unity.Mathematics;
 using EntityDomain;
-using GameConfigDomain;
 using PathFinding;
 
 namespace GridDomain
 {
     public class GridMap
     {
-        public static GridMap currentGridInstance;
+        public static GridMap currentGridInstance = null;
         private PathFinder pathFinder;
 
         // #### #### [++] Attributes [++] #### ####
@@ -20,17 +18,29 @@ namespace GridDomain
         private int _cols;
         private int _rows;
         private Cell[,] gridArray;
+        private List<LivingEntity> _livingEntities;
+        private GameObject _cellsContainer;
+        private GameObject _creatureContainer;
+        private GameObject _plantContainer;
         ArrayList grid;
         List<Entity> foundLivingEntities;
+
+        int2[] _moveDirections = {new int2(0,-1), new int2(-1,0), new int2(0,1), new int2(1,0)}; // these array will help you travel in the 4 directions more easily
         //private List<LivingEntity> _creatures = new List<LivingEntity>();
         // #### #### [--] Attributes [--] #### #### 
 
 
         // #### #### [++] Constructor [++] #### ####
-        public GridMap(int rows, int cols, float cellSize)
+        public static GridMap createGridMap(int rows, int cols, float cellSize)
         {
-            // if there is already a gridmap -> do nothing -> previous gridmap needs to be destroyed
-
+            if (currentGridInstance == null)
+            {
+                GridMap.currentGridInstance = new GridMap(rows, cols, cellSize);
+            }
+            return GridMap.currentGridInstance;
+        }
+        private GridMap(int rows, int cols, float cellSize)
+        {
             // create grid object and put it inside game container
             this._gridObject = new GameObject("Grid");
             this._gridObject.transform.SetParent(GameObject.Find("GameObjects").transform);
@@ -39,16 +49,38 @@ namespace GridDomain
             setColsNumber(cols);
             setCellSize(cellSize);
             positionTo(getCenter());
+            initializeContainers();
+            initializeLivingEntitiesList();
             ConstructGridArray();
             addRandomCreatures();
-            spawnRandomPlants();
+            spawnRandomPlants(10);
             setPathFinder();
-            GridMap.currentGridInstance = this;
+        }
+
+        private void initializeContainers()
+        {
+            this._cellsContainer = new GameObject("CellsContainer");
+            this._cellsContainer.transform.SetParent(this._gridObject.transform);
+            this._cellsContainer.transform.localPosition = new Vector3(0,0,0);
+
+            this._creatureContainer = new GameObject("CreatureContainer");
+            this._creatureContainer.transform.SetParent(this._gridObject.transform);
+            this._creatureContainer.transform.localPosition = new Vector3(0,0,0);
+
+            this._plantContainer = new GameObject("PlantContainer");
+            this._plantContainer.transform.SetParent(this._gridObject.transform);
+            this._plantContainer.transform.localPosition = new Vector3(0,0,0);
+        }
+
+        private void initializeLivingEntitiesList()
+        {
+            this._livingEntities = new List<LivingEntity>();
         }
 
         private void ConstructGridArray()
         {
             gridArray = new Cell[this._cols, this._rows];
+
             // create a <Cell> and <Tile> pointing to null to change its value for constructing the array 
             Cell cell;
             Tile tile;
@@ -65,7 +97,7 @@ namespace GridDomain
 
                         // creating tile to insert into cell; setting its sprite from the Asset Service Class
                         tile = new Tile(GridTileSet_AssetService.instance.tile_default, coordinates);
-                        cell = new Cell(this._gridObject, coordinates, this._cellSize, tile);
+                        cell = new Cell(this._cellsContainer, coordinates, this._cellSize, tile);
 
                         gridArray[col, row] = cell;
                     } catch (System.Exception exception) {
@@ -83,37 +115,70 @@ namespace GridDomain
             {
                 for (int col = 0; col < gridArray.GetLength(0); col++)
                 {
-                    int doSpawn = UnityEngine.Random.Range(1, GameConfig.instance.SpawnEntityProbability);
+                    int doSpawn = UnityEngine.Random.Range(1, Configs.SpawnProbability_Creature());
                     if (doSpawn == 1)
                     {
                         newCreature = new Creature(new int2(col, row));
 
                         Transform newCreatureTransform = newCreature.getObject().transform;
-                        newCreatureTransform.SetParent(this._gridObject.transform);
+                        newCreatureTransform.SetParent(this._creatureContainer.transform);
                         
                         // set creature in the corresponding grid position
                         newCreatureTransform.localPosition = new Vector3(col * this._cellSize, row * this._cellSize, newCreatureTransform.position.z - 5);
-                        //this._creatures.Add(newCreature);
                         this.gridArray[col, row].setEntity(newCreature);
 
-                        /*Debug.Log("prefab: " + EntityConfig.instance.CreaturePrefab);
-                        newCreature = GameObject.Instantiate(EntityConfig.instance.CreaturePrefab, gridArray[col, row].getObject().transform.position, gridArray[col, row].getObject().transform.rotation);
-                        newCreature.GetComponent<Creature>().Initialize(new int2(col, row));
-                        Debug.Log(newCreature.name + " coordinates " + newCreature.GetComponent<Creature>().getCoordinates());
-                        gridArray[col, row].setEntity(newCreature.GetComponent<Creature>());*/
+                        // add it to the alive creatures list
+                        this._livingEntities.Add(newCreature);
                     }
                 }
             }
         }
 
-        public void spawnRandomPlants()
+        public void addBornCreatures(List<Creature> children)
+        {
+            foreach(Creature child in children)
+            {
+                Transform newCreatureTransform = child.getObject().transform;
+                newCreatureTransform.SetParent(this._creatureContainer.transform);
+                child.getObject().transform.localPosition = new Vector3(child.getCoordinates().x * this._cellSize, child.getCoordinates().y * this._cellSize, child.getObject().transform.position.z - 5);
+                this._livingEntities.Add(child);
+            }
+        }
+
+        /*private bool tryToGiveBirthTo(Creature child)
+        {
+            // try to put the creature on one of the neighbouring cells if cell is free
+            int tries = 4;
+            int positionIndex = UnityEngine.Random.Range(0,3);
+
+            int2 chosenCoordinates = motherCoordinates + this._moveDirections[positionIndex];
+            while(!isCellFree(gridArray[chosenCoordinates.x, chosenCoordinates.y]) && tries > 0)
+            {
+                positionIndex = UnityEngine.Random.Range(0,3);
+                chosenCoordinates = motherCoordinates + this._moveDirections[positionIndex];
+                tries--;
+            }
+            if (isCellFree(gridArray[chosenCoordinates.x, chosenCoordinates.y]))
+            {
+                child.setCoordinates(chosenCoordinates);
+                child.getObject().transform.localPosition = new Vector3(chosenCoordinates.x * this._cellSize, chosenCoordinates.y * this._cellSize, child.getObject().transform.position.z - 5);
+                return true;
+            }
+            else
+            {
+                child.kill();
+                return false;
+            }
+        }*/
+
+        public void spawnRandomPlants(float probabilityFactor = 1)
         {
             Debug.Log("Spawning plants...");
             Plant newPlant;
             Cell randomCell;
             int numberOfTiles = this._rows * this._cols;
 
-            int plantsToSpawn = UnityEngine.Random.Range(0, numberOfTiles / GameConfig.instance.SpawnPlantProbability + 1);
+            int plantsToSpawn = UnityEngine.Random.Range((int)(1 * probabilityFactor), (int)(numberOfTiles / Configs.SpawnProbability_Plant() * probabilityFactor) + 1);
             for (int plantNumber = 1; plantNumber <= plantsToSpawn; plantNumber++)
             {
                 randomCell = findRandomCell();
@@ -125,7 +190,7 @@ namespace GridDomain
                 newPlant = new Plant(new int2(randomCell.getCoordinates().x, randomCell.getCoordinates().y));
 
                 Transform newPlantTransform = newPlant.getObject().transform;
-                newPlantTransform.SetParent(this._gridObject.transform);
+                newPlantTransform.SetParent(this._plantContainer.transform);
                 
                 // set plant in the corresponding grid position
                 newPlantTransform.localPosition = new Vector3(randomCell.getCoordinates().x * this._cellSize, randomCell.getCoordinates().y * this._cellSize, newPlantTransform.position.z - 5);
@@ -206,12 +271,10 @@ namespace GridDomain
         }
         // ---- [--] Cols [--] ----
 
-        // ---- [++] Alive Creature List [++] ----
-        /*public List<LivingEntity> getCreatures()
+        public GameObject getObject()
         {
-            return this._creatures;
-        }*/
-        // ---- [--] Alive Creature List [--] ----
+            return this._gridObject;
+        }
         // #### #### [--] Getters & Setters [--] #### ####
 
         // ---- [++] Change Grid Position [++] ----
@@ -235,7 +298,20 @@ namespace GridDomain
 
 
         // #### #### [++] Methods [++] #### ####
-        public void updateCreatures()
+        public void updateLivingEntitiesList()
+        {
+            if (this._livingEntities != null)
+            {
+                foreach(LivingEntity entity in this._livingEntities.ToArray())  // using ToArray() because list is constantly changing so we make a copy
+                {
+                    if(entity != null)
+                    {   
+                        entity.updateBrain();
+                    }
+                }
+            }
+        }
+        public void updateLivingEntities()
         {
             if (this.gridArray != null)
             {
@@ -248,6 +324,26 @@ namespace GridDomain
                             Creature foundLivingEntity = (Creature)cell.getEntity();
                             foundLivingEntity.updateBrain();
                         }
+                        if (cell.getEntity().GetType() == typeof(Plant))
+                        {
+                            Plant foundLivingEntity = (Plant)cell.getEntity();
+                            foundLivingEntity.updateBrain();
+                        }
+                    }
+                }
+            }
+        }
+
+        public void updateLivingEntitiesEnergyClock(float energyConsumedOnUpdate)
+        {
+            if (this._livingEntities != null)
+            {
+                foreach(LivingEntity entity in this._livingEntities.ToArray())  // using ToArray() because list is constantly changing so we make a copy
+                {
+                    if(entity != null)
+                    {   
+                        entity.modifyEnergyBy(energyConsumedOnUpdate);
+                        entity.updateStats();
                     }
                 }
             }
@@ -268,6 +364,7 @@ namespace GridDomain
         }
         public void destroyDeadEntities()
         {
+            // DEPRECATED
             if (this.gridArray != null)
             {
                 Debug.Log("dead body collection started...");
@@ -287,10 +384,17 @@ namespace GridDomain
             Debug.Log("dead body collection ended..");
         }
 
+        public void killLivingEntity(LivingEntity entity)
+        {
+            // remove all references so the garbage collector will trash this entity
+            gridArray[entity.getCoordinates().x, entity.getCoordinates().y].setEntity(new NullEntity());
+            this._livingEntities.Remove(entity);
+        }
+
         public List<Entity> getVisibleEntities(Creature askingEntity)
         {
             int2 entityCoordinates = askingEntity.getCoordinates();
-            int sightDistance = askingEntity.getSightDistance();
+            int sightDistance = askingEntity.getGene_SightDistance();
 
             // computing sight limts
             int col_min, col_max, row_min, row_max;
@@ -336,38 +440,51 @@ namespace GridDomain
             return this.foundLivingEntities;
         }
 
-        public void moveCreatureRandomly(int2 creatureCoordinates, Vector2 moveDirection)
+        public void moveCreatureRandomly(int2 initialCreatureCoordinates, int2 creatureMoveDirection, Creature creature)
         {
-            int2 cellCoordinates = getNextCellRaw(creatureCoordinates);
+            int2[] nextCellResult = getNextCellRaw(initialCreatureCoordinates, creatureMoveDirection);
+            int2 cellCoordinates = nextCellResult[0];
+            int2 newDirection = new int2(1, 0); // default direction
             
-            if (cellCoordinates.x != -1 && cellCoordinates.y != -1)
+            if (cellCoordinates.x != -1 && cellCoordinates.y != -1 && nextCellResult.Length > 1)
             {
                 //  if cell is free, move the creature
-            gridArray[cellCoordinates.x, cellCoordinates.y].setEntity((Creature)gridArray[creatureCoordinates.x, creatureCoordinates.y].getEntity());   // move creature to next cell
-            Creature movedEntity = (Creature)gridArray[cellCoordinates.x, cellCoordinates.y].getEntity();
-            movedEntity.setCoordinates(new int2(cellCoordinates.x, cellCoordinates.y));              // update creature coordinates
-            // movedEntity.setMoveDirection(moveDirection);
-            gridArray[creatureCoordinates.x, creatureCoordinates.y].setEntity(new NullEntity());     // remove creature from previous cell                                                        
+                // move creature to next cell
+                gridArray[cellCoordinates.x, cellCoordinates.y].setEntity(creature);
 
-            //Transform movedEntityTransform = movedEntity.getObject().transform;  
-            //Vector3 currentPos = movedEntityTransform.localPosition;
-            //Vector3 nextPos = new Vector3(cellCoordinates.x * this._cellSize, cellCoordinates.y * this._cellSize, movedEntityTransform.position.z);
-            
-            //float moveSpeed = movedEntity.getMoveSpeed();
+                // update creature coordinates
+                creature.setCoordinates(new int2(cellCoordinates.x, cellCoordinates.y));
 
-            //movedEntityTransform.localPosition = Vector3.Lerp(currentPos, nextPos, 1f);
+                // remove creature from previous cell                                                        
+                if (gridArray[initialCreatureCoordinates.x, initialCreatureCoordinates.y].getEntity() == creature)
+                {
+                    // this check is made for children born form the mother which will spawn in the same cell as the mother
+                    // but will not be put in the cell's Entity attribute
+                    gridArray[initialCreatureCoordinates.x, initialCreatureCoordinates.y].setEntity(new NullEntity());
+                    newDirection = nextCellResult[1];
+                    creature.setMoveDirection(newDirection);
+                }
             }
             
         }
-        public void moveCreatureTo(int2 creatureCoordinates, int2 targetCoordinates)
+        public void moveCreatureTo(int2 initialCreatureCoordinates, int2 targetCoordinates, Creature creature)
         {
             if (targetCoordinates.x != -1 && targetCoordinates.y != -1)
             {
                 //  if cell is free, move the creature
-                gridArray[targetCoordinates.x, targetCoordinates.y].setEntity((Creature)gridArray[creatureCoordinates.x, creatureCoordinates.y].getEntity());   // move creature to next cell
-                Creature movedEntity = (Creature)gridArray[targetCoordinates.x, targetCoordinates.y].getEntity();
-                movedEntity.setCoordinates(new int2(targetCoordinates.x, targetCoordinates.y));          // update creature coordinates
-                gridArray[creatureCoordinates.x, creatureCoordinates.y].setEntity(new NullEntity());     // remove creature from previous cell             
+                // move creature to next cell
+                gridArray[targetCoordinates.x, targetCoordinates.y].setEntity(creature);
+
+                // update creature coordinates                             
+                creature.setCoordinates(new int2(targetCoordinates.x, targetCoordinates.y));                               
+                
+                // remove creature from previous cell   
+                if (gridArray[initialCreatureCoordinates.x, initialCreatureCoordinates.y].getEntity() == creature)
+                {
+                    // this check is made for children born form the mother which will spawn in the same cell as the mother
+                    // but will not be put in the cell's Entity attribute
+                    gridArray[initialCreatureCoordinates.x, initialCreatureCoordinates.y].setEntity(new NullEntity());     
+                }          
             }
             
         }
@@ -377,42 +494,7 @@ namespace GridDomain
             return pathFinder.findPathTo(startCoordinates, targetCoordinates, this.gridArray);
         }
 
-        /*public static Vector2 rotate(Vector2 vector, float alpha)
-        {
-            return new Vector2(
-                vector.x * Mathf.Cos(alpha) - vector.y * Mathf.Sin(alpha),
-                vector.x * Mathf.Sin(alpha) + vector.y * Mathf.Cos(alpha)
-            );
-        }*/
-
-        private Vector3 rotate(Vector3 vector, float degrees)
-        {   // dont think it works properly
-            float vectorDegrees = CalculateAngle(vector, Vector3.right); // calculate the angle between this vector and world 0 rotation
-            float newVectorDegrees = vectorDegrees;
-            
-            if (GameConfig.instance.Debugging)
-            {
-                Debug.Log("direction degrees: " + vectorDegrees);
-            }
-            
-            if (vectorDegrees + degrees >= 360)
-            {
-                newVectorDegrees = vectorDegrees + degrees - 360;
-            }
-            if (vectorDegrees + degrees <= 0)
-            {
-                newVectorDegrees = Mathf.Abs(vectorDegrees + degrees);
-            }
-            return Quaternion.Euler(0, 0, newVectorDegrees) * vector;
-        }
-        private float CalculateAngle(Vector3 from, Vector3 to)
-        {
-            //return Quaternion.FromToRotation(Vector3.up, to - from).eulerAngles.z;
-            float angle = Vector3.Angle(from, to);
-            return (Vector3.Angle(Vector3.left, to) > 90f) ? 360f - angle : angle;   
-        }
-
-        private int2 getNextCellVector(int2 creatureCoordinates, Vector3 moveDirection)
+        /*private int2 getNextCellVector(int2 creatureCoordinates, Vector3 moveDirection)
         {
             // TO DO : NOT CHANGING DIRECTION ENOUGH
             float alphaDegrees = UnityEngine.Random.Range(-90, 90);
@@ -442,18 +524,20 @@ namespace GridDomain
                 //goto Redo;
             }
             return nextCellCoordinates;
-        }
+        }*/
 
-        private int2 getNextCellRaw(int2 creatureCoordinates)
+        private int2[] getNextCellRaw(int2 creatureCoordinates, int2 creatureMoveDirection)
         {
-            const int max_tries = 4;
+            
+
+            const int max_tries = 8;
             int tries = 0;
 
             int2 newCellCoordinates;
-            int xOffset,yOffset;
+            //int xOffset,yOffset;
 
             Redo:
-            xOffset = UnityEngine.Random.Range(-1, 2);
+            /*xOffset = UnityEngine.Random.Range(-1, 2);
 
             if (xOffset != 0) // x == {-1,1}; y == 0
             {
@@ -466,9 +550,33 @@ namespace GridDomain
                 {
                     yOffset = UnityEngine.Random.Range(-1, 2);
                 }
+            }*/
+            // find index of direction
+            int currentDirection = 0;
+            for(int direction = 0; direction < this._moveDirections.Length; direction++)
+            {
+                if (creatureMoveDirection.x == this._moveDirections[direction].x && creatureMoveDirection.y == this._moveDirections[direction].y)
+                {
+                    currentDirection = direction;
+                }
             }
+
+            int offset = UnityEngine.Random.Range(-1, 2);
+            int newDirectionIndex = currentDirection + offset;
+            
+            if (newDirectionIndex > 3)
+            {
+                newDirectionIndex = 0;
+            }
+            if (newDirectionIndex < 0)
+            {
+                newDirectionIndex = 3;
+            }
+
+            int2 newDirection = this._moveDirections[newDirectionIndex];
+
             tries++;
-            newCellCoordinates = new int2(creatureCoordinates.x + xOffset, creatureCoordinates.y + yOffset);
+            newCellCoordinates = new int2(creatureCoordinates.x + newDirection.x, creatureCoordinates.y + newDirection.y);
             if (tries <= max_tries)
             {
                 if (!isInBounds(newCellCoordinates))
@@ -479,11 +587,13 @@ namespace GridDomain
                 {
                     goto Redo;
                 }
-                return newCellCoordinates;
+                int2[] result = {newCellCoordinates, newDirection};
+                return result;
             }
             else
             {
-                return new int2(-1, -1);
+                int2[] result = {new int2(-1, -1)};
+                return result;
             }
         }
 
@@ -582,6 +692,7 @@ namespace GridDomain
         {
             return new int2((int)(position.x / this._cellSize), (int)(position.y / this._cellSize));
         }
+
         // #### #### [--] Methods [--] #### ####
     }
 }

@@ -14,10 +14,8 @@ namespace EntityDomain
         // can send signals to energy system and energy system decides what to do with this object's energy levels
 
         // #### #### [++] Attributes [++] #### ####
-        private Chromosome _chromosome;
-        private float _energy;
-        protected float _nutritionValue;
-        protected LivingState _livingState;
+        protected new float _nutritionValue;
+        protected new LivingState _livingState;
         // #### #### [--] Attributes [--] #### ####
 
 
@@ -32,17 +30,17 @@ namespace EntityDomain
         
         // #### #### [++] Getters & Setters [++] #### ####
         // ---- [++] Energy [++] ---- 
-        public void setEnergy(float newEnergy) {}
-        public float getEnergy()
+        public new void setEnergy(float newEnergy) {}
+        public new float getEnergy()
         {
             return this._energy;
         }
-        public void modifyEnergyBy(float amount) {}
-        protected virtual void consumeEnergy(ActionType action) {}
+        public new void modifyEnergyBy(float amount) {}
+        protected new virtual void consumeEnergy(ActionType action) {}
         // ---- [--] Energy [--] ----
 
         // ---- [++] Nutrition [++] ----
-        public float getNutrition()
+        public new float getNutrition()
         {
             return this._nutritionValue;
         }
@@ -50,7 +48,9 @@ namespace EntityDomain
         // #### #### [--] Getters & Setters [--] #### ####
 
         protected override void eat(LivingEntity entity) {} // to be implemented by Plants and Creatures
-        public override void eaten() {}
+        public override void eatenBy(LivingEntity entity) {}
         protected override void initializeNutritionValue() {}
+        public override void updateBrain() {}
+        public override void updateStats() {}
     }
 }

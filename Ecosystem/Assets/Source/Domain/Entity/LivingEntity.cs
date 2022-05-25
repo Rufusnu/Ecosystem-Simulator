@@ -16,10 +16,11 @@ namespace EntityDomain
 
         // #### #### [++] Attributes [++] #### ####
         public static int livingEntityCounter = 0;
-        private Chromosome _chromosome;
-        private float _energy;
+        protected Chromosome _chromosome;
+        protected float _energy;
         protected float _nutritionValue;
         protected LivingState _livingState;
+        protected float _time;
         // #### #### [--] Attributes [--] #### ####
 
 
@@ -53,7 +54,11 @@ namespace EntityDomain
                 // newEnergy >  0
                 die();
             }
-            else                                
+            else if (this._energy + amount >= 1.0f)
+            {
+                this._energy = 1.0f;
+            }   
+            else                   
             {
                 // newEnergy <= 0
                 this._energy += amount;
@@ -84,25 +89,48 @@ namespace EntityDomain
             }
             return false;
         }
+
+        public Chromosome getChromosome()
+        {
+            return this._chromosome;
+        }
         // #### #### [--] Getters & Setters [--] #### ####
 
 
         // #### #### [++] Behaviour [++] #### ####
-        protected void die()
+        public void kill()
         {
             if (this.isAlive())
             {
                 //  status is set to DEAD and Coordinator will check for dead entities every few seconds and remove them
-                if (GameConfigDomain.GameConfig.instance.Debugging)
+                if (Configs.Debugging())
                 {
                     Debug.Log(this.getObject().name + " died.");
                 }
                 this._livingState = LivingState.Dead;
                 MonoBehaviour.Destroy(this.getObject());
+                GridDomain.GridMap.currentGridInstance.killLivingEntity(this);
+            }
+        }
+        protected void die()
+        {
+            if (this.isAlive())
+            {
+                //  status is set to DEAD and Coordinator will check for dead entities every few seconds and remove them
+                if (Configs.Debugging())
+                {
+                    Debug.Log(this.getObject().name + " died.");
+                }
+                this._livingState = LivingState.Dead;
+                MonoBehaviour.Destroy(this.getObject());
+                GridDomain.GridMap.currentGridInstance.killLivingEntity(this);
             }
         }
         protected abstract void eat(LivingEntity entity); // to be implemented by Plants and Creatures
-        public abstract void eaten();
+        public abstract void eatenBy(LivingEntity entity);
+        public abstract void updateBrain();
+        public abstract void updateStats();
+        
         protected abstract void initializeNutritionValue();
         // #### #### [--] Behaviour [--] #### ####
     }

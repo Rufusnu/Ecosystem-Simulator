@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using EntityDomain;
 
 namespace GeneticsDomain
 {
@@ -13,25 +14,38 @@ namespace GeneticsDomain
     public class UtilsGenetics : MonoBehaviour
     {
         public static UtilsGenetics instance; // make the instance visble and usable
+        private static bool _alive = false;
         
-
         private void Awake() {
-            instance = this;    
-            constructDictionary();
+            if (_alive == false)
+            {
+                instance = this;
+                _alive = true;
+            }
         }
-
-        // #### #### [++] Integer To Gender [++] #### ####
-        private Dictionary<int, string> gender; // used in <Chromosome> to make code easier to follow
-        private void constructDictionary()
-        {   // the dictionary translates int values 0,1 to human understandable values
-            this.gender.Add(0, "female");
-            this.gender.Add(1, "male");
-        }
-        public string intToGender(int integer) // used in <Chromosome> to make code easier to follow
+        public static bool areSimilar(LivingEntity entity1, LivingEntity entity2)
         {
-            return this.gender[integer];
+            Chromosome one = entity1.getChromosome();
+            Chromosome two = entity2.getChromosome();
+            if (one.getGenesCount() != two.getGenesCount())
+            {
+                return false;
+            }
+
+            float averageDifference = 0;
+            for(int geneIndex = 0; geneIndex < one.getGenesCount(); geneIndex++)
+            {
+                averageDifference += Mathf.Abs((one.getGenes()[geneIndex] + 1) - (two.getGenes()[geneIndex] + 1));
+            }
+            averageDifference /= one.getGenesCount();
+
+            if (averageDifference > 0.4)
+            {
+                return false;
+            }
+
+            return true;
         }
-        // #### #### [--] Integer To Gender [--] #### ####
 
     }
 }

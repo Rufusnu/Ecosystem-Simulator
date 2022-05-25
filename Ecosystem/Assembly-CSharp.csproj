@@ -46,19 +46,27 @@
      <Compile Include="Assets\Source\Domain\Grid\GridTileSet_AssetService.cs" />
      <Compile Include="Assets\Source\Domain\Entity\CreatureState.cs" />
      <Compile Include="Assets\Source\Coordinator.cs" />
+     <Compile Include="Assets\MonoBehaviours\CameraFollowSetup.cs" />
+     <Compile Include="Assets\MonoBehaviours\CameraFollow.cs" />
      <Compile Include="Assets\Source\Domain\Grid\Tile.cs" />
      <Compile Include="Assets\Source\Config\EntityConfig.cs" />
      <Compile Include="Assets\Source\Domain\Entity\NullEntity.cs" />
+     <Compile Include="Assets\Source\Animations\AnimatedFood.cs" />
+     <Compile Include="Assets\MonoBehaviours\PositionRendererSorter.cs" />
      <Compile Include="Assets\Source\Domain\Genetics\Chromosome.cs" />
      <Compile Include="Assets\Source\Domain\Entity\Plant.cs" />
+     <Compile Include="Assets\Source\Domain\Smell\Smell.cs" />
      <Compile Include="Assets\Source\Domain\Grid\Cell.cs" />
+     <Compile Include="Assets\Source\Domain\Entity\NullLivingEntity.cs" />
      <Compile Include="Assets\Source\Domain\Grid\PathFinding.cs" />
      <Compile Include="Assets\Source\Domain\Entity\Entity.cs" />
      <Compile Include="Assets\Source\Domain\Entity\State.cs" />
+     <Compile Include="Assets\Source\Config\ConfigInterface.cs" />
      <Compile Include="Assets\Source\Utils\Utils.cs" />
+     <Compile Include="Assets\MonoBehaviours\ComponentActions.cs" />
      <Compile Include="Assets\Source\Domain\Entity\Entity_AssetsService.cs" />
      <Compile Include="Assets\Source\Domain\Entity\Creature.cs" />
-     <Compile Include="Assets\Source\Domain\Entity\NullLivingEntity.cs" />
+     <Compile Include="Assets\Source\Domain\Entity\NullCreature.cs" />
     <Reference Include="UnityEngine">
         <HintPath>D:\___FISIERE___\_Workspace\Informatica\Game dev\Unity\2020.3.30f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

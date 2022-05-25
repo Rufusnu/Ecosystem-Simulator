@@ -241,7 +241,7 @@ Transform:
   - {fileID: 445943752}
   - {fileID: 1740101902}
   m_Father: {fileID: 651332194}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
@@ -296,7 +296,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 17
+  orthographic size: 32
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -324,7 +324,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 651332194}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &651332193
 GameObject:
@@ -353,6 +353,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 1796740416}
   - {fileID: 670758659}
   - {fileID: 509689599}
   - {fileID: 519420032}
@@ -390,7 +391,7 @@ Transform:
   - {fileID: 1810067593}
   - {fileID: 1711764560}
   m_Father: {fileID: 651332194}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1420675653
 GameObject:
@@ -420,7 +421,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 651332194}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1711764559
 GameObject:
@@ -467,8 +468,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MutationFactor: 0.05
   maxKcalEnergy: 3000
+  CreatureNeutralColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   UpdateIntervalOfCreatureBrain: 0.5
-  SightDistanceInCells: 2
+  SightDistanceInCells: 4
   MoveDuration: 1
   MoveSpeed: 3
   minDeathAge: 60
@@ -477,6 +479,7 @@ MonoBehaviour:
   CreatureMaxNutritionValue: 300
   PlantMinNutritionValue: 150
   PlantMaxNutritionValue: 250
+  AnimatedFoodPrefab: {fileID: 6670787840041260003, guid: 207d2eec37a60c14cab4bb0773a3fa92, type: 3}
 --- !u!1 &1740101901
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,6 +527,36 @@ MonoBehaviour:
   creature_female: {fileID: 21300000, guid: 69830d2a68ecefa4cbec141da2b534d1, type: 3}
   creature_male: {fileID: 21300000, guid: 0995dece7be77c443918c407cda61df3, type: 3}
   plant_default: {fileID: 21300000, guid: f586f505246c70d43bb47bd9dc0b2dc6, type: 3}
+--- !u!1 &1796740415
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1796740416}
+  m_Layer: 0
+  m_Name: Game Handler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1796740416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796740415}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.4686124, y: -3.2410727, z: -31.750916}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 651332194}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1810067592
 GameObject:
   m_ObjectHideFlags: 0
@@ -567,10 +600,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7a3668cbe1ab74899caf49cd2a58cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GameSpeedMultiplier: 10
   Debugging: 0
   Debugging_EnergySystem: 0
-  GridRows: 27
-  GridColumns: 48
+  GridRows: 54
+  GridColumns: 96
   GridCellSize: 1.15
-  SpawnEntityProbability: 100
-  SpawnPlantProbability: 200
+  SpawnEntityProbability: 40
+  SpawnPlantProbability: 60

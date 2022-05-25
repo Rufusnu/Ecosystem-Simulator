@@ -9,14 +9,17 @@ namespace GeneticsDomain
     {
         // #### #### [++] Attributes [++] #### ####
         private List<float> _genes = new List<float>();
-        private int _genesCount;
         // #### #### [--] Attributes [--] #### ####
 
 
         // #### #### [++] Constructor [++] #### ####
         public Chromosome()
         {
-            this._genesCount = 0;
+            this._genes = new List<float>();
+        }
+        public Chromosome(Chromosome chromosome)
+        {
+            this._genes = new List<float>(chromosome.getGenes());
         }
         // #### #### [--] Constructor [--] #### ####
 
@@ -41,7 +44,7 @@ namespace GeneticsDomain
         }
         public int getGenesCount()
         {
-            return this._genesCount;
+            return this._genes.Count;
         }
         // ---- [--] Genes [--] ----
         // #### #### [--] Getters & Setters [--] #### ####
@@ -49,35 +52,37 @@ namespace GeneticsDomain
 
         // #### #### [++] Behaviour [++] #### ####
         // ---- [++] Genes Inheritance [++] ---- 
-        public void inheritGenes(Chromosome parentMaleChromosome, Chromosome parentFemaleChromosome)
+        public void inheritGenes(Chromosome mother, Chromosome father)
         {
             // make a copy of the genes
-            List<float> genesMale = parentMaleChromosome.getGenes();
-            List<float> genesFemale = parentFemaleChromosome.getGenes();
+            List<float> genesMale = father.getGenes();
+            List<float> genesFemale = mother.getGenes();
 
-            if (parentMaleChromosome.getGenes().Count != parentMaleChromosome.getGenes().Count)
+            if (father.getGenes().Count != father.getGenes().Count)
             {
                 throw new System.Exception("<Chromosome> Cannot inherit from two chromosomes of different lenght.");
             }
 
-            // create empty genes
-            inheritParentsRandomly(this._genes, genesMale, genesFemale);
+            inheritParentsRandomly(genesMale, genesFemale);
             mutateGenes(this._genes);
         }
-        private void inheritParentsRandomly(List<float> genesOffspring, List<float> genesMale, List<float> genesFemale)
+        private void inheritParentsRandomly(List<float> genesFemale, List<float> genesMale)
         {
+            // reset chromosome genes
+            this._genes = new List<float>();
+
             // randomly choose genes from parents
             int parent = 0;
             for(int geneIndex = 0; geneIndex < genesMale.Count; geneIndex++)
             {
-                parent = Random.Range(0,1); // select parent randomly
-                if (UtilsGenetics.instance.intToGender(parent) == "female") // dictionary used to make code easier to follow
+                parent = Random.Range(0,2); // select parent randomly
+                if (parent == 0)
                 {   // inherit female gene
-                    genesOffspring.Add(genesFemale[geneIndex]);
+                    this._genes.Add(genesFemale[geneIndex]);
                 }
                 else
                 {   // inherit male gene
-                    genesOffspring.Add(genesMale[geneIndex]);
+                    this._genes.Add(genesMale[geneIndex]);
                 }
             }
         }
@@ -88,8 +93,8 @@ namespace GeneticsDomain
             for(int geneIndex = 0; geneIndex < newGenes.Count; geneIndex++)
             {
                 // randomly choose which genes to mutate
-                toMutate = Random.Range(0,1);
-                if (toMutate == 1)
+                toMutate = Random.Range(0,10);
+                if (toMutate == 0)
                 {   
                     newGenes[geneIndex] = mutateGene(newGenes[geneIndex]);
                 }
@@ -99,11 +104,12 @@ namespace GeneticsDomain
         {
             // selected genes mutate randomly between -0.05 and 0.05 of current value
             // TO DO : change so it mutates less and less as it gets close to the boundries
+            float mutationFactor = Configs.MutationFactor();
 
-            float mutatedGene = gene + Random.Range(-EntityConfig.instance.MutationFactor, EntityConfig.instance.MutationFactor);
+            float mutatedGene = gene + Random.Range(-mutationFactor, mutationFactor);
             while (mutatedGene == gene || mutatedGene < -1.0f || mutatedGene > 1.0f)
             {
-                mutatedGene = gene + Random.Range(-EntityConfig.instance.MutationFactor, EntityConfig.instance.MutationFactor);
+                mutatedGene = gene + Random.Range(-mutationFactor, mutationFactor);
             }
             return mutatedGene;
         }
