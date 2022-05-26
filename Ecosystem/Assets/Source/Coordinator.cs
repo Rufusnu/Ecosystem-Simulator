@@ -11,18 +11,14 @@ public class Coordinator : MonoBehaviour
     // Coordinates the whole game behaviour
     
     // set update interval; less resource intensive
-
-    // !! Need to implement different intervals for the various type of updates
+    
     Creature test;
     GridMap grid;
     private float _time;
 
-    void Awake()
-    {
-
-    }
     void Start()
     {
+        this.name = "Coordinator";
         Time.timeScale = Time.timeScale * Configs.GameSpeedMultiplier();
         this._time = 0;
         drawGrid();
@@ -33,19 +29,21 @@ public class Coordinator : MonoBehaviour
     void FixedUpdate()
     {
         this.grid.updateLivingEntitiesList();
-        executeEvery(EnergySystem.UpdateIntervalOfEnergySystem);
+        executeSpawnEvery(EnergySystem.UpdateIntervalOfEnergySystem);
     }
+    
     private void executeRepeatableFunctions()
     {
         // Energy System
         EnergySystem.executeUpdate();
         
         // entities collector
-        this.grid.destroyDeadEntities();
+        
+        
         this.grid.spawnRandomPlants();
     }
 
-    private void executeEvery(float seconds)
+    private void executeSpawnEvery(float seconds)
     {
         // execute what needs to be executed every [updateInterval_EnergySystem] seconds
         this._time += Time.deltaTime;
@@ -56,6 +54,7 @@ public class Coordinator : MonoBehaviour
         }
     }
     // #### #### [--] Updates [--] #### ####
+
 
     private void drawGrid()
     {

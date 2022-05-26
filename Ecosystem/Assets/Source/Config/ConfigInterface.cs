@@ -137,5 +137,16 @@ public static class Configs
         {
             return EntityConfig.instance.AnimatedFoodPrefab;
         }
+
+        // ---- [++] Smell [++] ----
+        public static float SmellSpriteAlpha()
+        {
+            return EntityConfig.instance.SmellSpriteAlpha;
+        }
+        public static float SmellPlaceInterval()
+        {
+            return EntityConfig.instance.SmellPlaceInterval;
+        }
+        // ---- [--] Smell [--] ----
     // ### ### [--] EntityConfig List [--] ### ###
 }

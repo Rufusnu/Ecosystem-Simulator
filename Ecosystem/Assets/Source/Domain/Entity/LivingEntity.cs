@@ -98,20 +98,6 @@ namespace EntityDomain
 
 
         // #### #### [++] Behaviour [++] #### ####
-        public void kill()
-        {
-            if (this.isAlive())
-            {
-                //  status is set to DEAD and Coordinator will check for dead entities every few seconds and remove them
-                if (Configs.Debugging())
-                {
-                    Debug.Log(this.getObject().name + " died.");
-                }
-                this._livingState = LivingState.Dead;
-                MonoBehaviour.Destroy(this.getObject());
-                GridDomain.GridMap.currentGridInstance.killLivingEntity(this);
-            }
-        }
         protected void die()
         {
             if (this.isAlive())
@@ -122,7 +108,8 @@ namespace EntityDomain
                     Debug.Log(this.getObject().name + " died.");
                 }
                 this._livingState = LivingState.Dead;
-                MonoBehaviour.Destroy(this.getObject());
+                this.destroySmell();
+                this.destroyObject();
                 GridDomain.GridMap.currentGridInstance.killLivingEntity(this);
             }
         }
@@ -132,6 +119,8 @@ namespace EntityDomain
         public abstract void updateStats();
         
         protected abstract void initializeNutritionValue();
+        public abstract int getSmellIntensity();
+        protected abstract void destroySmell();
         // #### #### [--] Behaviour [--] #### ####
     }
 }

@@ -64,5 +64,22 @@ namespace EcoMath
             return (Vector3.Angle(Vector3.left, to) > 90f) ? 360f - angle : angle;   
         }
         // #### #### [--] Creature Direction [--] #### ####
+
+
+        public static void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 1f)
+        {
+            GameObject myLine = new GameObject();
+            myLine.transform.position = start;
+            myLine.AddComponent<LineRenderer>();
+            LineRenderer lr = myLine.GetComponent<LineRenderer>();
+            lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+            lr.startColor = color;
+            lr.endColor = color;
+            lr.startWidth = 0.1f;
+            lr.endWidth = 0.1f;
+            lr.SetPosition(0, start);
+            lr.SetPosition(1, end);
+            GameObject.Destroy(myLine, duration);
+        }
     }
 }

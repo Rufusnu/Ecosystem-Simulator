@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using EntityDomain;
 using Unity.Mathematics;
+using SmellDomain;
 
 namespace GridDomain
 {
@@ -14,6 +15,7 @@ namespace GridDomain
         private GameObject _cellObject = null;
         private Tile _tile = null;
         private Entity _entity = new NullEntity(); // what entity is on the cell; is it occupied? used for pathfinding
+        private List<SmellNode> _smells = new List<SmellNode>();
         // #### #### [--] Attributes [--] #### #### 
 
 
@@ -110,6 +112,25 @@ namespace GridDomain
             return this._entity;
         }
         // ---- [--] Entity [--] ---- 
+
+        // ---- [++] Smells [++] ---- 
+        public void addSmell(SmellNode smellNode)
+        {
+            if (smellNode == null)
+            {
+                return;
+            }
+            this._smells.Add(smellNode);
+        }
+        public void destroySmell(SmellNode smellNode)
+        {
+            if (smellNode == null)
+            {
+                return;
+            }
+            this._smells.Remove(smellNode);
+        }
+        // ---- [--] Smells [--] ---- 
         // #### #### [--] Getters & Setters [--] #### ####
 
 

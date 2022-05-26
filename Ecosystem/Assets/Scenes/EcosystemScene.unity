@@ -320,7 +320,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -20}
+  m_LocalPosition: {x: 0, y: 0, z: -50}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 651332194}
@@ -480,6 +480,8 @@ MonoBehaviour:
   PlantMinNutritionValue: 150
   PlantMaxNutritionValue: 250
   AnimatedFoodPrefab: {fileID: 6670787840041260003, guid: 207d2eec37a60c14cab4bb0773a3fa92, type: 3}
+  SmellSpriteAlpha: 0.3
+  SmellPlaceInterval: 4
 --- !u!1 &1740101901
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,6 +529,7 @@ MonoBehaviour:
   creature_female: {fileID: 21300000, guid: 69830d2a68ecefa4cbec141da2b534d1, type: 3}
   creature_male: {fileID: 21300000, guid: 0995dece7be77c443918c407cda61df3, type: 3}
   plant_default: {fileID: 21300000, guid: f586f505246c70d43bb47bd9dc0b2dc6, type: 3}
+  smell_default: {fileID: 2747690628134850419, guid: ae93ef7c6bb365b489f211501af381f7, type: 3}
 --- !u!1 &1796740415
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,11 +603,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7a3668cbe1ab74899caf49cd2a58cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameSpeedMultiplier: 10
+  GameSpeedMultiplier: 1
   Debugging: 0
   Debugging_EnergySystem: 0
   GridRows: 54
   GridColumns: 96
   GridCellSize: 1.15
-  SpawnEntityProbability: 40
-  SpawnPlantProbability: 60
+  SpawnEntityProbability: 130
+  SpawnPlantProbability: 90

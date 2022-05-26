@@ -25,6 +25,7 @@ namespace EntityDomain
         public Sprite creature_female;
         public Sprite creature_male;
         public Sprite plant_default;
+        public Sprite smell_default;
         // ### [--] Sprite List [--] ###
     }
 }

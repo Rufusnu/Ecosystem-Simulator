@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using EntityDomain;
 using PathFinding;
+using SmellDomain;
 
 namespace GridDomain
 {
@@ -53,7 +54,7 @@ namespace GridDomain
             initializeLivingEntitiesList();
             ConstructGridArray();
             addRandomCreatures();
-            spawnRandomPlants(10);
+            spawnRandomPlants(25);
             setPathFinder();
         }
 
@@ -124,7 +125,7 @@ namespace GridDomain
                         newCreatureTransform.SetParent(this._creatureContainer.transform);
                         
                         // set creature in the corresponding grid position
-                        newCreatureTransform.localPosition = new Vector3(col * this._cellSize, row * this._cellSize, newCreatureTransform.position.z - 5);
+                        newCreatureTransform.localPosition = new Vector3(col * this._cellSize, row * this._cellSize, -15);
                         this.gridArray[col, row].setEntity(newCreature);
 
                         // add it to the alive creatures list
@@ -140,7 +141,7 @@ namespace GridDomain
             {
                 Transform newCreatureTransform = child.getObject().transform;
                 newCreatureTransform.SetParent(this._creatureContainer.transform);
-                child.getObject().transform.localPosition = new Vector3(child.getCoordinates().x * this._cellSize, child.getCoordinates().y * this._cellSize, child.getObject().transform.position.z - 5);
+                child.getObject().transform.localPosition = new Vector3(child.getCoordinates().x * this._cellSize, child.getCoordinates().y * this._cellSize, -15);
                 this._livingEntities.Add(child);
             }
         }
@@ -389,6 +390,14 @@ namespace GridDomain
             // remove all references so the garbage collector will trash this entity
             gridArray[entity.getCoordinates().x, entity.getCoordinates().y].setEntity(new NullEntity());
             this._livingEntities.Remove(entity);
+        }
+        public void destroySmell(SmellNode smellNode)
+        {
+            gridArray[smellNode.getCoordinates().x, smellNode.getCoordinates().y].destroySmell(smellNode);
+        }
+        public void addSmell(SmellNode smellNode)
+        {
+            gridArray[smellNode.getCoordinates().x, smellNode.getCoordinates().y].addSmell(smellNode);
         }
 
         public List<Entity> getVisibleEntities(Creature askingEntity)

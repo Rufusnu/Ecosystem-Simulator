@@ -10,7 +10,7 @@ namespace EntityDomain
         // #### #### [++] Attributes [++] #### ####
         public static int entityCounter = 0;
         private int2 _coordinates;
-        private GameObject _object = null;
+        private GameObject _object;
         // #### #### [--] Attributes [--] #### ####
 
 
@@ -39,6 +39,10 @@ namespace EntityDomain
         protected void setObject(GameObject newObject)
         {
             this._object = newObject;
+        }
+        protected void destroyObject()
+        {
+            GameObject.Destroy(this._object);
         }
         // ---- [--] Coordinates [--] ---- 
         // #### #### [--] Getters & Setters [--] #### ####

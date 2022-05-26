@@ -9,6 +9,195 @@ using GeneticsDomain;
 
 namespace SmellDomain
 {
+    public class SmellNode : Entity
+    {
+        // A creature will find any of the nodes and follow them towards [Node0]
+
+        //  |    node - intensity    |    node - intensity    |    node - intensity   |
+        //  |  [Node0] [    3    ] <--> [Node1] [    2    ] <--> [Node3] [    1    ]  |
+
+        // Node 0 is always the GOAL node
+
+
+        protected LivingEntity _whose;
+        protected Color _color;
+        protected Color _lineColor;
+        protected Entity _nextNode;
+        protected SmellNode _previousNode;
+        protected int _intensity;
+
+        public SmellNode(LivingEntity entity) : base(entity.getCoordinates())
+        {
+            // used to start a new chain of Nodes
+            this._whose = entity;
+            int intensity = this._whose.getSmellIntensity();   // obtain intensity from creature genes
+            this._nextNode = this._whose;
+            
+            if (this.setIntensity(intensity) == false)
+            {
+                throw new System.Exception("<SmellNode> Cannot construct a smell intensity <= 0!");
+            }
+            this._previousNode = null;
+            initializeObject();
+            GridMap.currentGridInstance.addSmell(this);
+        }
+
+        public SmellNode(LivingEntity entity, SmellNode currentNode) : base(entity.getCoordinates())
+        {
+            // used to continue a chain of existing nodes
+            this._whose = entity;
+            int intensity = this._whose.getSmellIntensity();   // obtain intensity from creature genes
+            this._nextNode = this._whose;
+
+            if (this.setIntensity(intensity) == false)
+            {
+                throw new System.Exception("<SmellNode> Cannot construct a smell intensity <= 0!");
+            }
+            this.setPreviousNode(currentNode);
+            initializeObject();
+            GridMap.currentGridInstance.addSmell(this);
+
+            if (this.getObject() != null && this._previousNode.getObject() != null)
+            {
+                Debug.DrawLine(this.getObject().transform.position, this._previousNode.getObject().transform.position, this._lineColor, 12.0f);
+            }
+        }
+
+        private void initializeObject()
+        {
+            this.setObject(new GameObject("<Smell of " + this._whose.getObject().name + ">"));
+            // settings position
+            this.getObject().transform.SetParent(this._whose.getObject().transform.parent);
+            Vector3 whosePosition = this._whose.getObject().transform.localPosition;
+            this.getObject().transform.localPosition = new Vector3(whosePosition.x, whosePosition.y, -3);
+
+            // setting sprite
+            // Sprite color is gene dependant
+            this.getObject().AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.smell_default;
+            updateSpriteColor();
+        }
+
+        private void updateSpriteColor()
+        {
+            if (this.getObject() == null)
+            {
+                return;
+            }
+            this._color = this._whose.getObject().GetComponent<SpriteRenderer>().color;
+            this._color = new Color(this._color.r, this._color.g, this._color.b, Configs.SmellSpriteAlpha());
+            this._lineColor = new Color(this._color.r, this._color.g, this._color.b, 0.9f);
+            this.getObject().GetComponent<SpriteRenderer>().color = this._color;
+        }
+
+        public Entity getNext()
+        {
+            // returns next node if exists, else it returns the entity whose smell it is
+            // this way, it can obtain its coordinates because both classes are inherited
+            // from <Entity> class that has coordinates
+
+            return this._nextNode;
+        }
+
+        private void setNextNode(SmellNode newNextNode)
+        {
+            if (newNextNode == null || newNextNode._intensity <= 0)
+            {
+                return;
+            }
+            this._nextNode = newNextNode;
+        }
+
+        private void setPreviousNode(SmellNode newPreviousNode)
+        {
+            if (newPreviousNode == null || newPreviousNode._intensity <= 0)
+            {
+                return;
+            }
+            this._previousNode = newPreviousNode;                     
+            (this._previousNode).setNextNode(this);                   
+            (this._previousNode).setIntensity(this._intensity - 1);               
+        }                                                   
+
+        private bool setIntensity(int newIntensity)
+        {
+            // this function goes through all the previous existing nodes and updates their intensity
+
+            if (newIntensity <= 0)
+            {
+                // If the intensity is <= 0 => remove the node from the chain, if it is in one
+                destroySelf();
+                return false;
+            }
+            this._intensity = newIntensity;
+            this.updateSpriteColor();
+
+            // if previous node exists (we have a reference to it)
+            if (this._previousNode != null)
+            {
+                this._previousNode.setIntensity(this._intensity - 1);
+            }
+            return true;
+        }
+
+        public void destroySelf()
+        {
+            // remove from previouses
+            if (this._previousNode != null)
+            {
+                // call recursively to destroy all previous nodes
+                this._previousNode.destroySelf();
+                
+                // remove link to nodes after destroyed
+                this._previousNode = null;
+            }
+            this.destroyObject();
+
+            // remove from nexts
+            if (this._nextNode != null)
+            {
+                // next node link to this
+                if (this._nextNode.GetType() == typeof(SmellNode))
+                {
+                    ((SmellNode)this._nextNode)._previousNode = null;
+                }
+                else if (this._nextNode.GetType() == typeof(Creature))
+                {
+                    //((Creature)this._nextNode).deleteSmellReference();
+                    //((Creature)this._whose).deleteSmellReference();
+                }
+
+                // remove this link to next node
+                this._nextNode = null;
+            }
+            
+            // remove reference from grid cell
+            GridMap.currentGridInstance.destroySmell(this);
+        }
+
+        public bool isValid()
+        {
+            if (this._intensity <= 0)
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    Smell spreading implementation (more costly, yet more realistic)
+
     public static class SmellSystem
     {
         private static List<Smell> smells = new List<Smell>();
@@ -40,6 +229,7 @@ namespace SmellDomain
         }
     }
 
+    
     public abstract class Smell
     {
         protected float _transmissionRate;
@@ -123,5 +313,5 @@ namespace SmellDomain
         {
             this._source = source;
         }
-    }
+    }*/
 }   

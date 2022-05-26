@@ -21,7 +21,7 @@ namespace EntityConfigDomain
         //public GameObject CreaturePrefab;
 
         // ---- [++] Entity Genetics [++] ----
-        public float MutationFactor = 0.02f; // default
+        public float MutationFactor = 0.01f; // default
         // ---- [--] Entity Genetics [--] ----
 
 
@@ -32,8 +32,8 @@ namespace EntityConfigDomain
         public int SightDistanceInCells = 4;
         public float MoveDuration = 1.0f; // seconds
         public float MoveSpeed = 3.0f;
-        public float minDeathAge = 60;
-        public float maxDeathAge = 110;
+        public float minDeathAge = 90;
+        public float maxDeathAge = 150;
         public float CreatureMinNutritionValue = 300; // kcal
         public float CreatureMaxNutritionValue = 500; // kcal
         // ---- [--] Creatures [--] ----
@@ -44,6 +44,11 @@ namespace EntityConfigDomain
         // ---- [--] Plants [--] ----
 
         public GameObject AnimatedFoodPrefab;
+
+        // ---- [++] Smell [++] ----
+        public float SmellSpriteAlpha = 0.2f;
+        public float SmellPlaceInterval = 1f; // seconds
+        // ---- [--] Smell [--] ----
 
         // ### [--] Config List [--] ###
     }

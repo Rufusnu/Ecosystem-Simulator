@@ -52,5 +52,7 @@ namespace EntityDomain
         protected override void initializeNutritionValue() {}
         public override void updateBrain() {}
         public override void updateStats() {}
+        public override int getSmellIntensity() {return 0;}
+        protected override void destroySmell() {}
     }
 }

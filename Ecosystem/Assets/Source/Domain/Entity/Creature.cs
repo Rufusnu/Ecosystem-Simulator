@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using GeneticsDomain;
 using GridDomain;
+using SmellDomain;
 
 namespace EntityDomain
 {
@@ -14,9 +15,10 @@ namespace EntityDomain
         //private GameObject _creatureObject = null;
 
         private float _randomInterval;
+        private float _smellPlaceInterval;
         protected BrainState _brainState;
         protected CreatureState _physicalState;
-        
+        private bool _isInitializing = true;
         protected int id;
         protected float _age = 30;
         protected float _deathAge = 60;
@@ -26,7 +28,9 @@ namespace EntityDomain
         protected int2 _currentMoveDir;
         private LivingEntity _targetFood;
         private Creature _targetMate;
+        //private Entity _targetSmell;
         private float _urgeToMate;
+        private float _matingCooldown;
         private Queue<Creature> _rejectedBy;
         private List<Entity> _visibleEntities;
         private Queue<int2> _path;
@@ -40,6 +44,9 @@ namespace EntityDomain
         protected float _geneSensorialSight;
         protected float _geneFoodPreference;
         protected float _geneBehaviour;
+
+        protected SmellNode _smell = null;
+        protected float _time_smell;
         // ---- [--] Genes [--] ----
 
         protected Vector3 _animationStartPos;
@@ -56,19 +63,22 @@ namespace EntityDomain
         {
             this._animationElapsedTime = 0;
             this._randomInterval = randomizeInterval(Configs.BrainUpdateInterval_Creature());
+            this._smellPlaceInterval = Configs.SmellPlaceInterval();
             this._time = UnityEngine.Random.Range(-this._randomInterval, this._randomInterval);
+            this._time_smell = 0;
             
             initializeTargets();
             initializePath();
             initializeStates();
             initializeMoveDirection();
             initializeRandomGender();
-            initializeCreatureObject(this._gender);
             setRandomAge();
             initializeDefaultGenes();
+            initializeCreatureObject(this._gender);
+            updateObjectColor();
             initializeRandomUrge();
             initializeVisibleEntities();
-            updateSize();
+            updateSize();            
 
             Creature.creatureCounter++;
             this.id = creatureCounter;
@@ -79,8 +89,20 @@ namespace EntityDomain
             initializeAge();
             initializeChildScale();
             initializeRandomUrge();
+            updateObjectColor();    // re-update the colors since the genes changes
         }
 
+        private void initializeSmell()
+        {
+            if (this._smell == null)
+            {
+                this._smell = new SmellNode(this);
+            }
+            if (this._smell == null)
+            {
+                throw new System.Exception("NULL SMELL CREATION");
+            }
+        }
 
         private void initializeTargets()
         {
@@ -110,7 +132,6 @@ namespace EntityDomain
             */
             this.setObject(new GameObject("[Creature" + Creature.creatureCounter + "]"));
             this.getObject().AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.creature_default;
-            this.getObject().GetComponent<SpriteRenderer>().color = Configs.NeutralColor_Creature();     // graycolor
         }
         private void initializeCreatureObject(CreatureGender gender)
         {
@@ -123,8 +144,21 @@ namespace EntityDomain
             {
                 this.getObject().AddComponent<SpriteRenderer>().sprite = Entity_AssetsService.instance.creature_female;
             }
-            this.getObject().GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f, 1.0f);      // black color
         }
+        private void updateObjectColor()
+        {
+            //  Sprite color is gene dependant
+            float yellow = (21 * this._geneMotorSpeed + 21 * this._geneBrainSpeed)/255; // fast
+            float blue = (-1)*(21 * this._geneMotorSpeed + 21 * this._geneBrainSpeed)/255; // slow
+
+            float magenta = (-1)*(21 * this._geneFoodPreference + 21 * this._geneBehaviour)/255; // carnivore
+            float green = (21 * this._geneFoodPreference + 21 * this._geneBehaviour)/255;; // herbivore
+
+            float cyan = (-1)*(21 * this._geneSensorialSight + 21 * this._geneSensorialSmell)/255; // bad senses
+            float red = (21 * this._geneSensorialSight + 21 * this._geneSensorialSmell)/255; // good senses
+            this.getObject().GetComponent<SpriteRenderer>().color = new Color(0.5f + yellow + magenta + red, 0.5f + yellow + green + cyan, 0.5f + blue + magenta + cyan, 1.0f);      // black color
+        }
+
         private void initializeRandomGender()
         {
             int gender = UnityEngine.Random.Range(0,2);
@@ -203,6 +237,11 @@ namespace EntityDomain
         // this updating method might not wait for currently active action to finish -> find a method -> maybe actuallty states
         public override void updateBrain()
         {
+            if (this._isInitializing)
+            {
+                initializeSmell();
+                this._isInitializing = false;
+            }
             if (this.isAlive())
             {
                 if (isOld())
@@ -216,8 +255,10 @@ namespace EntityDomain
                 }
                 else
                 {
-                    executeEvery(this._randomInterval);
+                    placeSmell();
+                    executeActEvery(this._randomInterval);
                 }
+                clocks();
             }
         }
         private void toBeExecutedEvery()
@@ -237,9 +278,10 @@ namespace EntityDomain
             }
         }
 
-        private void executeEvery(float seconds)
-        {   // execute every given seconds
-            this._time += Time.deltaTime;    // only increment if creature is idle
+        private void executeActEvery(float seconds)
+        {   
+            // execute every given seconds
+            this._time += Time.deltaTime;
 
             if (this._time >= seconds)
             {
@@ -252,6 +294,13 @@ namespace EntityDomain
                 toBeExecutedEvery();
             }
         }
+        private void clocks()
+        {
+            // execute every given seconds
+            this._time_smell += Time.deltaTime;
+            this._matingCooldown += Time.deltaTime;
+        }
+
         private float randomizeInterval(float seconds)
         {   
             // should add a modifier (genetics) to change the randomize interval to
@@ -276,7 +325,7 @@ namespace EntityDomain
                     {
                         this._urgeToMate = 1;
                     }
-                    this._urgeToMate += 0.05f;
+                    this._urgeToMate += 0.03f;
                 }
             }
         }
@@ -343,6 +392,19 @@ namespace EntityDomain
         public float getGene_Behaviour()
         {
             return this._geneBehaviour;
+        }
+
+        public override int getSmellIntensity()
+        {
+            if ((int)((this._geneFoodPreference + 1)*2 + (-1)*(this._geneSensorialSight - 1)*0.5f + (-1)*(this._geneSensorialSmell - 1) + (-1)*(this._geneBrainSpeed - 1)*0.5f + (-1)*(this._geneMotorSpeed - 1)*2 + (-1)*(this._geneBehaviour - 1)*0.5f) <= 0)
+            {
+                return 1;
+            }
+            return (int)((this._geneFoodPreference + 1)*2 + (-1)*(this._geneSensorialSight - 1)*0.5f + (-1)*(this._geneSensorialSmell - 1) + (-1)*(this._geneBrainSpeed - 1)*0.5f + (-1)*(this._geneMotorSpeed - 1)*2 + (-1)*(this._geneBehaviour - 1)*0.5f);
+        }
+        public void deleteSmellReference()
+        {
+            this._smell = null;
         }
         // ---- [--] Genes [--] ----
         
@@ -417,12 +479,20 @@ namespace EntityDomain
 
         protected override void eat(LivingEntity entity)
         {
-            if (this._targetFood != null)
+            if (entity != null)
             {
+                if (entity.GetType() == typeof(Creature))
+                {
+                    if (isSimilar((Creature)entity))
+                    {
+                        return;
+                    }
+                }
                 animateEating(entity);
                 float kcal = entity.getNutrition();
                 float energy = Energy.EnergySystem.kcalToEnergy(kcal);
                 this.modifyEnergyBy(energy);
+                this._urgeToMate += energy/3;
                 entity.eatenBy(this);
                 //this._targetFood = new NullLivingEntity();
             }
@@ -435,12 +505,13 @@ namespace EntityDomain
         public void mateWith(Creature female)
         {
             // function called only within males
-            if (female != null)
+            if (female != null && female.isMature() && this.isMature())
             {
                 // male behaviour
+                this._urgeToMate = 0;
+                this._matingCooldown = 0;
                 female.getPregnantWith(this);
                 //animateMating(mate);
-                this._urgeToMate = 0;
             }
         }
         private void getPregnantWith(Creature male)
@@ -453,16 +524,16 @@ namespace EntityDomain
                 {
                     // female behaviour
                     // get pregnant / give birth
-                    giveBirthWith(male);
                     this._urgeToMate = 0;
+                    this._matingCooldown = 0;
+                    giveBirthWith(male);
                 }
             }
-            
         }
         private void giveBirthWith(Creature father)
         {
             // function called only within females
-            int numberOfChildren = UnityEngine.Random.Range(0, 6);
+            int numberOfChildren = UnityEngine.Random.Range(3, 10);
             List<Creature> children = new List<Creature>();
 
             for(int child = 1; child <= numberOfChildren; child++)
@@ -516,7 +587,7 @@ namespace EntityDomain
                         // if food ok, search for other needs
                         if (this._gender == CreatureGender.Male)
                         {
-                            if (this._urgeToMate > 0.6f)
+                            if (this._urgeToMate > 0.8f && this._matingCooldown > 1.0f)
                             {
                                 tryToMate();     
                             }
@@ -679,7 +750,7 @@ namespace EntityDomain
         {
             if (this._targetFood != null)
             {
-                if (EcoMath.Math.distanceBetween(this, this._targetFood) == 1)
+                if (EcoMath.Math.distanceBetween(this, this._targetFood) <= 1)
                 {
                     return true;
                 }
@@ -690,7 +761,7 @@ namespace EntityDomain
         {
             if (this._targetMate != null)
             {
-                if (EcoMath.Math.distanceBetween(this, this._targetMate) == 1)
+                if (EcoMath.Math.distanceBetween(this, this._targetMate) <= 1)
                 {
                     return true;
                 }
@@ -908,6 +979,34 @@ namespace EntityDomain
                 return false;
             }
             return true;
+        }
+
+        private void placeSmell()
+        {
+            if (this._time_smell >= Configs.SmellPlaceInterval())
+            {
+                this._time_smell = 0;
+
+                // replace the current smell node with a new one
+                this._smell = new SmellNode(this, this._smell);
+                if (this._smell == null)
+                {
+                    throw new System.Exception("NULL SMELL CREATION");
+                }
+            }
+            
+        }
+
+        protected override void destroySmell()
+        {
+            if (this._smell != null)
+            {
+                this._smell.destroySelf();
+            }
+            else
+            {
+                throw new System.Exception("NULL SMELL IN CREATURE");
+            }
         }
         // #### #### [--] Behaviour [--] #### ####
 

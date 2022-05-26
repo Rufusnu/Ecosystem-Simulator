@@ -120,6 +120,14 @@ namespace EntityDomain
         {
             
         }
+        public override int getSmellIntensity()
+        {
+            return 0;
+        }
+        protected override void destroySmell()
+        {
+            
+        }
     }
 }
 
