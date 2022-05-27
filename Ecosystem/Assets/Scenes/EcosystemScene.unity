@@ -466,15 +466,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c4fa9f748e049d46ac83259c7b02d6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MutationFactor: 0.05
+  MutationFactor: 0.01
+  AverageDifferenceValidator: 0.2
+  RejectionProbability: 0.2
+  CreatureSense_Sight_Creature: 1
+  CreatureSense_Sight_Plant: 1
+  CreatureSense_Smell_Creature: 1
+  CreatureSense_Smell_Plant: 1
   maxKcalEnergy: 3000
   CreatureNeutralColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   UpdateIntervalOfCreatureBrain: 0.5
   SightDistanceInCells: 4
+  SmellDistanceInCells: 2
+  SmellLowestToSense: 4
   MoveDuration: 1
   MoveSpeed: 3
-  minDeathAge: 60
-  maxDeathAge: 110
+  minDeathAge: 70
+  maxDeathAge: 150
   CreatureMinNutritionValue: 200
   CreatureMaxNutritionValue: 300
   PlantMinNutritionValue: 150
@@ -603,11 +611,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7a3668cbe1ab74899caf49cd2a58cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameSpeedMultiplier: 1
+  GameSpeedMultiplier: 30
   Debugging: 0
   Debugging_EnergySystem: 0
   GridRows: 54
   GridColumns: 96
   GridCellSize: 1.15
-  SpawnEntityProbability: 130
-  SpawnPlantProbability: 90
+  SpawnEntityProbability: 100
+  SpawnPlantProbability: 80

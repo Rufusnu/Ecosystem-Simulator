@@ -54,5 +54,6 @@ namespace EntityDomain
         public override void updateStats() {}
         public override int getSmellIntensity() {return 0;}
         protected override void destroySmell() {}
+        protected override bool isSimilar(LivingEntity creature) {return false;}
     }
 }

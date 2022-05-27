@@ -128,6 +128,10 @@ namespace EntityDomain
         {
             
         }
+        protected override bool isSimilar(LivingEntity creature)
+        {
+            return false;
+        }
     }
 }
 

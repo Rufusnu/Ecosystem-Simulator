@@ -68,6 +68,10 @@ namespace EntityDomain
         {
             modifyEnergyBy(action.energyNeeded);
         }
+        protected virtual void consumeEnergy(ActionType action, float modifier)
+        {
+            modifyEnergyBy(action.energyNeeded + action.energyNeeded*modifier);
+        }
         // ---- [--] Energy [--] ----
 
         // ---- [++] Nutrition [++] ----
@@ -121,6 +125,7 @@ namespace EntityDomain
         protected abstract void initializeNutritionValue();
         public abstract int getSmellIntensity();
         protected abstract void destroySmell();
+        protected abstract bool isSimilar(LivingEntity creature);
         // #### #### [--] Behaviour [--] #### ####
     }
 }

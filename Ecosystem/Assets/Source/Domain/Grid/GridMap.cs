@@ -24,10 +24,9 @@ namespace GridDomain
         private GameObject _creatureContainer;
         private GameObject _plantContainer;
         ArrayList grid;
-        List<Entity> foundLivingEntities;
 
         int2[] _moveDirections = {new int2(0,-1), new int2(-1,0), new int2(0,1), new int2(1,0)}; // these array will help you travel in the 4 directions more easily
-        //private List<LivingEntity> _creatures = new List<LivingEntity>();
+
         // #### #### [--] Attributes [--] #### #### 
 
 
@@ -405,7 +404,7 @@ namespace GridDomain
             int2 entityCoordinates = askingEntity.getCoordinates();
             int sightDistance = askingEntity.getGene_SightDistance();
 
-            // computing sight limts
+            // computing sight distance limts
             int col_min, col_max, row_min, row_max;
             col_min = entityCoordinates.x - sightDistance;
             col_max = entityCoordinates.x + sightDistance;
@@ -430,8 +429,8 @@ namespace GridDomain
             }
 
 
-            // going through the gridArray and return found LivingEntities
-            this.foundLivingEntities = new List<Entity>();
+            // going through the gridArray sub-matrix and return found LivingEntities
+            List<Entity> foundLivingEntities = new List<Entity>();
             for (int col = col_min; col <= col_max; col++)
             {
                 for (int row = row_min; row <= row_max; row++)
@@ -440,13 +439,66 @@ namespace GridDomain
                     {
                         if (gridArray[col, row].getEntity() != askingEntity)
                         {
-                            this.foundLivingEntities.Add(gridArray[col, row].getEntity());
+                            foundLivingEntities.Add(gridArray[col, row].getEntity());
                         }
                     }
                 }
             }
 
-            return this.foundLivingEntities;
+            return foundLivingEntities;
+        }
+
+        public List<SmellNode> getSensedSmells(Creature askingEntity)
+        {
+            int2 entityCoordinates = askingEntity.getCoordinates();
+            float smellLowestToSense = askingEntity.getGene_SensorialSmell();
+
+            // computing smell distance limts
+            int col_min, col_max, row_min, row_max;
+            col_min = entityCoordinates.x - Configs.SmellDistance();
+            col_max = entityCoordinates.x + Configs.SmellDistance();
+            row_min = entityCoordinates.y - Configs.SmellDistance();
+            row_max = entityCoordinates.y + Configs.SmellDistance();
+
+            if (col_min < 0)
+            {
+                col_min = 0;
+            }
+            if (col_max > this._cols - 1)
+            {
+                col_max = this._cols - 1;
+            }
+            if (row_min < 0)
+            {
+                row_min = 0;
+            }
+            if (row_max > this._rows - 1)
+            {
+                row_max = this._rows - 1;
+            }
+
+
+            // going through the gridArray sub-matrix and return found LivingEntities
+            List<SmellNode> foundSmells = new List<SmellNode>();
+            for (int col = col_min; col <= col_max; col++)
+            {
+                for (int row = row_min; row <= row_max; row++)
+                {
+                    if (gridArray[col, row].hasSmell())
+                    {
+                        foreach(SmellNode smell in gridArray[col, row].getSmells())
+                        {
+                            if (smell.getIntensity() > askingEntity.getSmellIntensity() && smell.source() != askingEntity)
+                            {
+                                // it is able to sense the smell => add it
+                                foundSmells.Add(smell);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return foundSmells;
         }
 
         public void moveCreatureRandomly(int2 initialCreatureCoordinates, int2 creatureMoveDirection, Creature creature)

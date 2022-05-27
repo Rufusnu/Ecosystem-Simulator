@@ -27,12 +27,14 @@ namespace EntityDomain
         private int2[] _moveDirections = {new int2(0,-1), new int2(-1,0), new int2(0,1), new int2(1,0)};
         protected int2 _currentMoveDir;
         private LivingEntity _targetFood;
+        private float _foodPreferenceModifier; // positive number for herbivores | negative for carnivores
         private Creature _targetMate;
         //private Entity _targetSmell;
         private float _urgeToMate;
         private float _matingCooldown;
         private Queue<Creature> _rejectedBy;
         private List<Entity> _visibleEntities;
+        private List<SmellNode> _sensedSmells;
         private Queue<int2> _path;
 
         // ---- [++] Genes [++] ----
@@ -73,12 +75,13 @@ namespace EntityDomain
             initializeMoveDirection();
             initializeRandomGender();
             setRandomAge();
+            initializeDeathAge();
             initializeDefaultGenes();
             initializeCreatureObject(this._gender);
             updateObjectColor();
             initializeRandomUrge();
             initializeVisibleEntities();
-            updateSize();            
+            updateSize();
 
             Creature.creatureCounter++;
             this.id = creatureCounter;
@@ -194,12 +197,12 @@ namespace EntityDomain
                                                                                 //               Energy consumption
                                                                                 //     less       |    default   |    more
 
-            this._geneMotorSpeed = UnityEngine.Random.Range(-0.8f, 0.8f);        // -1.0 slowest   | 0.0 default  | 1.0 fastest
-            this._geneBrainSpeed = UnityEngine.Random.Range(-0.8f, 0.8f);        // -1.0 slowest   | 0.0 default  | 1.0 fastest
-            this._geneSensorialSmell = UnityEngine.Random.Range(-0.8f, 0.8f);    // -1.0 worst     | 0.0 default  | 1.0 best
-            this._geneSensorialSight = UnityEngine.Random.Range(-0.8f, 0.8f);    // -1.0 worst     | 0.0 default  | 1.0 best
-            this._geneFoodPreference = UnityEngine.Random.Range(-0.8f, 0.8f);    // -1.0 carnivore | 0.0 omnivore | 1.0 erbivore
-            this._geneBehaviour = UnityEngine.Random.Range(-0.8f, 0.8f);         // -1.0 bad       | 0.0 both     | 1.0 good
+            this._geneMotorSpeed = UnityEngine.Random.Range(-1f, 1f);        // -1.0 slowest   | 0.0 default  | 1.0 fastest
+            this._geneBrainSpeed = UnityEngine.Random.Range(-1f, 1f);        // -1.0 slowest   | 0.0 default  | 1.0 fastest
+            this._geneSensorialSmell = UnityEngine.Random.Range(-1f, 1f);    // -1.0 worst     | 0.0 default  | 1.0 best
+            this._geneSensorialSight = UnityEngine.Random.Range(-1f, 1f);    // -1.0 worst     | 0.0 default  | 1.0 best
+            this._geneFoodPreference = UnityEngine.Random.Range(-1f, 1f);    // -1.0 carnivore | 0.0 omnivore | 1.0 erbivore
+            this._geneBehaviour = UnityEngine.Random.Range(-1f, 1f);         // -1.0 bad       | 0.0 both     | 1.0 good
 
             this._chromosome.addGene(this._geneMotorSpeed);         // 0 MOTOR SPEED
             this._chromosome.addGene(this._geneBrainSpeed);         // 1 BRAIN SPEED
@@ -207,6 +210,8 @@ namespace EntityDomain
             this._chromosome.addGene(this._geneSensorialSight);     // 3 SIGHT
             this._chromosome.addGene(this._geneFoodPreference);     // 4 FOOD PREFERENCE
             this._chromosome.addGene(this._geneBehaviour);          // 5 BEHAVIOUR
+
+            this._foodPreferenceModifier = this._geneFoodPreference * 100;
         }
 
         private void initializeInheritedGenes(Creature mother, Creature father)
@@ -214,6 +219,8 @@ namespace EntityDomain
             this._mother = mother;
             this._father = father;
             this._chromosome.inheritGenes(mother.getChromosome(), father.getChromosome());
+
+            this._foodPreferenceModifier = this._geneFoodPreference * 100;
         }
         private void initializeRandomUrge()
         {
@@ -380,10 +387,11 @@ namespace EntityDomain
         public int getGene_SightDistance()
         {
             return (int)(this._geneSensorialSight + Configs.SightDistance()); // gene modifier * default sight distance
+                                                                              // lowest is better (can sense lower intensities)
         }
         public float getGene_SensorialSmell()
         {
-            return this._geneSensorialSmell;
+            return ((-1)*(Configs.SmellDefaultSense() * this._geneSensorialSmell) + Configs.SmellDefaultSense())/2; // formula returns a value between [0; 2*SmellDefaultSense]/2
         }
         public float getGene_FoodPreference()
         {
@@ -396,11 +404,11 @@ namespace EntityDomain
 
         public override int getSmellIntensity()
         {
-            if ((int)((this._geneFoodPreference + 1)*2 + (-1)*(this._geneSensorialSight - 1)*0.5f + (-1)*(this._geneSensorialSmell - 1) + (-1)*(this._geneBrainSpeed - 1)*0.5f + (-1)*(this._geneMotorSpeed - 1)*2 + (-1)*(this._geneBehaviour - 1)*0.5f) <= 0)
+            if ((int)((this._geneFoodPreference + 1)*2 + (-1)*(this._geneSensorialSight - 1)*0.5f + (-1)*(this._geneSensorialSmell - 1) + (-1)*(this._geneBrainSpeed - 1)*0.5f + (-1)*(this._geneMotorSpeed - 1)*2 + (-1)*(this._geneBehaviour - 1)*0.5f)*2 <= 0)
             {
                 return 1;
             }
-            return (int)((this._geneFoodPreference + 1)*2 + (-1)*(this._geneSensorialSight - 1)*0.5f + (-1)*(this._geneSensorialSmell - 1) + (-1)*(this._geneBrainSpeed - 1)*0.5f + (-1)*(this._geneMotorSpeed - 1)*2 + (-1)*(this._geneBehaviour - 1)*0.5f);
+            return (int)((this._geneFoodPreference + 1)*2 + (-1)*(this._geneSensorialSight - 1)*0.5f + (-1)*(this._geneSensorialSmell - 1) + (-1)*(this._geneBrainSpeed - 1)*0.5f + (-1)*(this._geneMotorSpeed - 1)*2 + (-1)*(this._geneBehaviour - 1)*0.5f)*2;
         }
         public void deleteSmellReference()
         {
@@ -488,11 +496,23 @@ namespace EntityDomain
                         return;
                     }
                 }
-                animateEating(entity);
+                
                 float kcal = entity.getNutrition();
+                if (entity.GetType() == typeof(Creature))
+                {
+                    kcal -= this._foodPreferenceModifier;
+                }
+                else if (entity.GetType() == typeof(Plant))
+                {
+                    kcal += this._foodPreferenceModifier;
+                }
+
+
+                animateEating(entity);
+                
                 float energy = Energy.EnergySystem.kcalToEnergy(kcal);
                 this.modifyEnergyBy(energy);
-                this._urgeToMate += energy/3;
+                this._urgeToMate += energy/5;
                 entity.eatenBy(this);
                 //this._targetFood = new NullLivingEntity();
             }
@@ -513,6 +533,7 @@ namespace EntityDomain
                 female.getPregnantWith(this);
                 //animateMating(mate);
             }
+            consumeEnergy(CreatureActions.Mate);
         }
         private void getPregnantWith(Creature male)
         {
@@ -529,11 +550,12 @@ namespace EntityDomain
                     giveBirthWith(male);
                 }
             }
+            consumeEnergy(CreatureActions.Mate);
         }
         private void giveBirthWith(Creature father)
         {
             // function called only within females
-            int numberOfChildren = UnityEngine.Random.Range(3, 10);
+            int numberOfChildren = UnityEngine.Random.Range(1, 6); // 6 10
             List<Creature> children = new List<Creature>();
 
             for(int child = 1; child <= numberOfChildren; child++)
@@ -546,7 +568,7 @@ namespace EntityDomain
         private void handleRejection()
         {
             this._rejectedBy.Enqueue(this._targetMate);
-            if (this._rejectedBy.Count > 5)
+            if (this._rejectedBy.Count > 2)
             {
                 this._rejectedBy.Dequeue();
             }
@@ -587,7 +609,7 @@ namespace EntityDomain
                         // if food ok, search for other needs
                         if (this._gender == CreatureGender.Male)
                         {
-                            if (this._urgeToMate > 0.8f && this._matingCooldown > 1.0f)
+                            if (this._urgeToMate > 0.8f && this._matingCooldown > 5.0f)
                             {
                                 tryToMate();     
                             }
@@ -601,7 +623,7 @@ namespace EntityDomain
                             tryToEat();
                         }
                     }
-                    consumeEnergy(CreatureActions.Think);
+                    consumeEnergy(CreatureActions.Think, this._geneBrainSpeed);
                     break;
                 case CreatureState.Exploring:
                     // moves one cell then resets to thinking
@@ -610,7 +632,7 @@ namespace EntityDomain
                     // (only after that, the creature's GameObject will move towards
                     //  the class's coordinates)
                     explore();
-                    consumeEnergy(CreatureActions.Move);
+                    consumeEnergy(CreatureActions.Move, this._geneMotorSpeed);
                     
                     this._physicalState = CreatureState.Thinking;
                     break;
@@ -634,7 +656,7 @@ namespace EntityDomain
                         if (GridMap.currentGridInstance.isCellFree(nextCell))
                         {
                             moveTo(nextCell);
-                            consumeEnergy(CreatureActions.Move);
+                            consumeEnergy(CreatureActions.Move, this._geneMotorSpeed);
                         }
                         else
                         {
@@ -822,7 +844,7 @@ namespace EntityDomain
         }
         private void updateSmell()
         {
-            // TO DO
+            this._sensedSmells = GridMap.currentGridInstance.getSensedSmells(this);
         }
         // [--] Update [--]
 
@@ -830,11 +852,14 @@ namespace EntityDomain
         // [++] Checking [++]
         private LivingEntity checkSensesForFood()
         {
-            float minDistanceCreature = Configs.GridColumns();
-            float minDistancePlant = Configs.GridColumns();
+            LivingEntity targetCreature_Sight = new EntityDomain.NullLivingEntity();
+            LivingEntity targetPlant_Sight = new EntityDomain.NullLivingEntity();
+
             float distance;
-            LivingEntity targetCreature = new EntityDomain.NullLivingEntity();
-            LivingEntity targetPlant = new EntityDomain.NullLivingEntity();
+
+            // [++] Sight [++]
+            float minDistanceCreature_Sight = Configs.GridColumns();
+            float minDistancePlant_Sight = Configs.GridColumns();
 
             foreach(LivingEntity livingEntity in this._visibleEntities)
             {
@@ -845,24 +870,59 @@ namespace EntityDomain
                     {
                         // eat only if not similar
                         distance = EcoMath.Math.distanceBetween(this, livingEntity);
-                        if (distance < minDistanceCreature)
+                        if (distance < minDistanceCreature_Sight)
                         {
-                            minDistanceCreature = distance;
-                            targetCreature = livingEntity;
+                            minDistanceCreature_Sight = distance;
+                            targetCreature_Sight = livingEntity;
                         }
                     }
                 }
                 else if (livingEntity.GetType() == typeof(Plant))
                 {
                     distance = EcoMath.Math.distanceBetween(this, livingEntity);
-                    if (distance < minDistancePlant)
+                    if (distance < minDistancePlant_Sight)
                     {
-                        minDistancePlant = distance;
-                        targetPlant = livingEntity;
+                        minDistancePlant_Sight = distance;
+                        targetPlant_Sight = livingEntity;
                     }
                 }
             }
+            // [--] Sight [--]
 
+            // [++] Smell [++]
+            LivingEntity targetCreature_Smell = new EntityDomain.NullLivingEntity();
+            LivingEntity targetPlant_Smell = new EntityDomain.NullLivingEntity();
+            
+            float minDistanceCreature_Smell = Configs.GridColumns();
+            float minDistancePlant_Smell = Configs.GridColumns();
+
+            foreach(SmellNode smell in this._sensedSmells)
+            {
+                if (smell.sourceType() == typeof(Creature) && this.isMature())
+                {
+                    Creature creature = (Creature)smell.source();
+                    if (!isSimilar(creature) && !isChildOf(this))
+                    {
+                        // eat only if not similar
+                        distance = EcoMath.Math.distanceBetween(this, smell) + smell.getDistanceToSource();
+                        if (distance < minDistanceCreature_Smell)
+                        {
+                            minDistanceCreature_Smell = distance;
+                            targetCreature_Smell = smell.source();
+                        }
+                    }
+                }
+                else if (smell.sourceType() == typeof(Plant))
+                {
+                    distance = EcoMath.Math.distanceBetween(this, smell) + smell.getDistanceToSource();
+                    if (distance < minDistancePlant_Smell)
+                    {
+                        minDistancePlant_Smell = distance;
+                        targetPlant_Smell = smell.source();
+                    }
+                }
+            }
+            // [--] Smell [--]
 
             /*if (this._geneFoodPreference < -0.8)
             {
@@ -876,11 +936,62 @@ namespace EntityDomain
                 return targetPlant; 
             }*/
 
-            // use the food preference in this function to determine what food the creatures will be wanting to eat more
-            float distanceToCreature = minDistanceCreature - (-1) * this._geneFoodPreference * minDistanceCreature;            
-            float distanceToPlant = minDistancePlant - this._geneFoodPreference * minDistancePlant;
+            // [++] Choosing best target [++]
 
-            if (distanceToCreature < distanceToPlant)
+            // use the food preference in this function to determine what food the creatures will be wanting to eat more
+            float distanceToCreature_Sight = minDistanceCreature_Sight - (-1) * this._geneFoodPreference * minDistanceCreature_Sight;            
+            float distanceToPlant_Sight = minDistancePlant_Sight - this._geneFoodPreference * minDistancePlant_Sight;
+            float distanceToCreature_Smell = minDistanceCreature_Smell - (-1) * this._geneFoodPreference * minDistanceCreature_Smell;            
+            float distanceToPlant_Smell = minDistancePlant_Smell - this._geneFoodPreference * minDistancePlant_Smell;
+
+            // comparing distances
+            float preferedDistance = Configs.GridColumns();
+            int preferedFood = -1;
+            List<float2> distances = new List<float2>();
+
+            if (Configs.CreatureSense_Sight_Creature())
+            {
+                distances.Add(new float2(distanceToCreature_Sight, 0));     // Creature Sight index  ==  0
+            }
+            if (Configs.CreatureSense_Sight_Plant())                  
+            {
+                distances.Add(new float2(distanceToPlant_Sight, 1));        // Plant Sight index     ==  1
+            }
+            if (Configs.CreatureSense_Smell_Creature())
+            {
+                distances.Add(new float2(distanceToCreature_Smell, 2));     // Creature Smell index  ==  2
+            }
+            if (Configs.CreatureSense_Smell_Plant())
+            {
+                distances.Add(new float2(distanceToPlant_Smell, 3));        // Plant Smell index     ==  3
+            }
+
+            // obtain the minimum distance
+            for (int i = 0; i < distances.Count; i++)
+            {
+                if (preferedDistance > distances[i][0])
+                {
+                    preferedDistance = distances[i][0];
+                    preferedFood = (int)distances[i][1];
+                }
+            }
+            
+            switch (preferedFood) 
+            {
+                case -1:
+                    return new EntityDomain.NullLivingEntity();
+                case 0:
+                    return targetCreature_Sight;
+                case 1:
+                    return targetPlant_Sight;
+                case 2:
+                    return targetCreature_Smell;
+                case 3:
+                    return targetPlant_Smell;
+            }
+            return new EntityDomain.NullLivingEntity();
+
+            /*if (distanceToCreature < distanceToPlant)
             {
                 // preferes to eat the creature
                 if (!isMature())
@@ -893,14 +1004,17 @@ namespace EntityDomain
             {
                 // preferes to eat the plant
                 return targetPlant;
-            }
+            }*/
+            // [--] Choosing best target [--]
         }
 
         private Creature checkSensesForMate()
         {
-            float minDistanceCreature = Mathf.Infinity;
             float distance;
-            LivingEntity target = new EntityDomain.NullLivingEntity();
+
+            // [++] Sight [++]
+            LivingEntity target_Sight = new EntityDomain.NullLivingEntity();
+            float minDistance_Sight = Configs.GridColumns();
 
             foreach(LivingEntity livingEntity in this._visibleEntities)
             {
@@ -910,26 +1024,83 @@ namespace EntityDomain
                     if (isValidMate(creature))
                     {
                         distance = EcoMath.Math.distanceBetween(this, livingEntity);
-                        if (distance < minDistanceCreature)
+                        if (distance < minDistance_Sight)
                         {
-                            minDistanceCreature = distance;
-                            target = livingEntity;
+                            minDistance_Sight = distance;
+                            target_Sight = creature;
                         }
                     }
                 }
             }
-            
-            if (target.GetType() == typeof(NullLivingEntity))
+            // [--] Sight [--]
+
+            // [++] Smell [++]
+            LivingEntity target_Smell = new EntityDomain.NullLivingEntity();
+            float minDistance_Smell = Configs.GridColumns();
+
+            foreach(SmellNode smell in this._sensedSmells)
             {
-                return null;
+                if (smell.sourceType() == typeof(Creature) && this.isMature())
+                {
+                    Creature creature = (Creature)smell.source();
+                    if (isValidMate(creature))
+                    {
+                        // eat only if not similar
+                        distance = EcoMath.Math.distanceBetween(this, smell) + smell.getDistanceToSource();
+                        if (distance < minDistance_Smell)
+                        {
+                            minDistance_Smell = distance;
+                            target_Smell = smell.source();
+                        }
+                    }
+                }
+            }
+            // [--] Smell [--]
+            
+            // comparing distances
+            float preferedDistance = Configs.GridColumns();
+            int preferedMate = -1;
+            List<float2> distances = new List<float2>();
+
+            if (Configs.CreatureSense_Sight_Creature())
+            {
+                distances.Add(new float2(minDistance_Sight, 0));     // Creature Sight index  ==  0
+            }
+            if (Configs.CreatureSense_Smell_Creature())
+            {
+                distances.Add(new float2(minDistance_Smell, 2));     // Creature Smell index  ==  2
             }
 
-            return (Creature)target;
+            // obtain the minimum distance
+            for (int i = 0; i < distances.Count; i++)
+            {
+                if (preferedDistance > distances[i][0])
+                {
+                    preferedDistance = distances[i][0];
+                    preferedMate = (int)distances[i][1];
+                }
+            }
+            
+            switch (preferedMate) 
+            {
+                case 0:
+                    return (Creature)target_Sight;
+                case 2:
+                    return (Creature)target_Smell;
+            }
+            return null;
         }
 
         private bool isValidMate(Creature potentialMate)
         {
-            if (!isSimilar(potentialMate) && potentialMate.getGender() != CreatureGender.Female && this._rejectedBy.Contains(potentialMate))
+            if (
+               !isSimilar(potentialMate)
+            || potentialMate.getGender() == CreatureGender.Male
+            || this._rejectedBy.Contains(potentialMate)
+            || potentialMate == this
+            || potentialMate.isChildOf(this)
+            || this.isChildOf(potentialMate)
+            )
             {
                 return false;
             }
@@ -972,9 +1143,9 @@ namespace EntityDomain
                 return false;
             }
 
-            // chance to want to or not
+            // chance to mate
             int probability = UnityEngine.Random.Range(0,10);
-            if (probability < 7)    // 70% probability to not be willing to
+            if (probability < Configs.RejectionProbability())    // 60% probability to be rejected
             {
                 return false;
             }
@@ -994,7 +1165,6 @@ namespace EntityDomain
                     throw new System.Exception("NULL SMELL CREATION");
                 }
             }
-            
         }
 
         protected override void destroySmell()
@@ -1078,7 +1248,7 @@ namespace EntityDomain
             }
             return false;
         }
-        private bool isSimilar(Creature creature)
+        protected override bool isSimilar(LivingEntity creature)
         {
             return UtilsGenetics.areSimilar(this, creature);
         }

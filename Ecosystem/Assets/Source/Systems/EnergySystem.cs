@@ -16,6 +16,7 @@ namespace Energy
         public static float EnergyConsumedOnUpdateEnergySystem = -0.01f;
         public static float MoveConsumption = -0.01f;
         public static float ThinkConsumption = -0.005f;
+        public static float MateConsumption = -0.3f;
 
         // #### #### [--] Attributes [--] #### ####
 

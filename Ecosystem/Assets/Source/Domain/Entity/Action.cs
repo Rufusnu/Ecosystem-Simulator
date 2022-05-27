@@ -37,6 +37,6 @@ namespace EntityDomain
         public static ActionType Drink = new ActionType(Actions.Drink_Creature, 0);
         public static ActionType Hunt = new ActionType(Actions.Hunt_Creature, 0);
         public static ActionType Flee = new ActionType(Actions.Flee_Creature, 0);
-        public static ActionType Mate = new ActionType(Actions.Mate_Creature, 0);
+        public static ActionType Mate = new ActionType(Actions.Mate_Creature, EnergySystem.MateConsumption);
     }
 }

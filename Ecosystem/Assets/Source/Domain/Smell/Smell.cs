@@ -57,10 +57,11 @@ namespace SmellDomain
             initializeObject();
             GridMap.currentGridInstance.addSmell(this);
 
-            if (this.getObject() != null && this._previousNode.getObject() != null)
-            {
-                Debug.DrawLine(this.getObject().transform.position, this._previousNode.getObject().transform.position, this._lineColor, 12.0f);
-            }
+            if (this != null && this._previousNode != null)
+                if (this.getObject() != null && this._previousNode.getObject() != null)
+                {
+                    Debug.DrawLine(this.getObject().transform.position, this._previousNode.getObject().transform.position, this._lineColor, 12.0f);
+                }
         }
 
         private void initializeObject()
@@ -116,8 +117,13 @@ namespace SmellDomain
             this._previousNode = newPreviousNode;                     
             (this._previousNode).setNextNode(this);                   
             (this._previousNode).setIntensity(this._intensity - 1);               
-        }                                                   
+        }                                  
 
+
+        public int getIntensity()
+        {
+            return this._intensity;
+        }
         private bool setIntensity(int newIntensity)
         {
             // this function goes through all the previous existing nodes and updates their intensity
@@ -174,6 +180,29 @@ namespace SmellDomain
             GridMap.currentGridInstance.destroySmell(this);
         }
 
+        public System.Type sourceType()
+        {
+            return this._whose.GetType();
+        }
+        public LivingEntity source()
+        {
+            return this._whose;
+        }
+        public float getDistanceToSource()
+        {
+            return EcoMath.Math.distanceBetween(new int2(0, 0), sumVectorsToSource());            
+        }
+
+        private int2 sumVectorsToSource()
+        {
+            // returns the resulting vector using polygon summation rule for vectors
+            if (this._nextNode.GetType() != typeof(SmellNode))
+            {
+                // it is the source
+                return this.getCoordinates();
+            }
+            return this.getCoordinates() + ((SmellNode)this._nextNode).sumVectorsToSource();
+        }
         public bool isValid()
         {
             if (this._intensity <= 0)

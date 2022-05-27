@@ -95,6 +95,15 @@ public static class Configs
             // Return sight distance in cells (integer)
             return EntityConfig.instance.SightDistanceInCells;
         }
+        public static int SmellDistance()
+        {
+            // Return sight distance in cells (integer)
+            return EntityConfig.instance.SmellDistanceInCells;
+        }
+        public static int SmellDefaultSense()
+        {
+            return EntityConfig.instance.SmellLowestToSense;
+        }
         public static float MoveDurationDefault()
         {
             return EntityConfig.instance.MoveDuration;
@@ -118,6 +127,32 @@ public static class Configs
         public static float NutritionValueMax_Creature()
         {
             return EntityConfig.instance.CreatureMaxNutritionValue;
+        }
+
+        public static bool CreatureSense_Sight_Creature()
+        {
+            return EntityConfig.instance.CreatureSense_Sight_Creature;
+        }
+        public static bool CreatureSense_Sight_Plant()
+        {
+            return EntityConfig.instance.CreatureSense_Sight_Plant;
+        }
+        public static bool CreatureSense_Smell_Creature()
+        {
+            return EntityConfig.instance.CreatureSense_Smell_Creature;
+        }
+        public static bool CreatureSense_Smell_Plant()
+        {
+            return EntityConfig.instance.CreatureSense_Smell_Plant;
+        }
+
+        public static float AverageDifferenceValidator()
+        {
+            return EntityConfig.instance.AverageDifferenceValidator;
+        }
+        public static float RejectionProbability()
+        {
+            return EntityConfig.instance.RejectionProbability;
         }
         // ---- [--] Creature [--] ----
 

@@ -75,12 +75,12 @@ namespace GeneticsDomain
             int parent = 0;
             for(int geneIndex = 0; geneIndex < genesMale.Count; geneIndex++)
             {
-                parent = Random.Range(0,2); // select parent randomly
-                if (parent == 0)
+                parent = Random.Range(0,10); // select parent randomly
+                if (parent <= 4)
                 {   // inherit female gene
                     this._genes.Add(genesFemale[geneIndex]);
                 }
-                else
+                else if (parent > 4)
                 {   // inherit male gene
                     this._genes.Add(genesMale[geneIndex]);
                 }
@@ -93,7 +93,7 @@ namespace GeneticsDomain
             for(int geneIndex = 0; geneIndex < newGenes.Count; geneIndex++)
             {
                 // randomly choose which genes to mutate
-                toMutate = Random.Range(0,10);
+                toMutate = Random.Range(0,7);
                 if (toMutate == 0)
                 {   
                     newGenes[geneIndex] = mutateGene(newGenes[geneIndex]);

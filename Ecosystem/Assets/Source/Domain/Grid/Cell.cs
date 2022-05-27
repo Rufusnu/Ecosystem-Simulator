@@ -114,6 +114,18 @@ namespace GridDomain
         // ---- [--] Entity [--] ---- 
 
         // ---- [++] Smells [++] ---- 
+        public bool hasSmell()
+        {
+            if (this._smells.Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        public List<SmellNode> getSmells()
+        {
+            return this._smells;
+        }
         public void addSmell(SmellNode smellNode)
         {
             if (smellNode == null)

@@ -22,7 +22,16 @@ namespace EntityConfigDomain
 
         // ---- [++] Entity Genetics [++] ----
         public float MutationFactor = 0.01f; // default
+        public float AverageDifferenceValidator = 0.5f;
+        public float RejectionProbability = 0.3f;
         // ---- [--] Entity Genetics [--] ----
+
+        // ---- [++] Toggles [++] ----
+        public bool CreatureSense_Sight_Creature = true;
+        public bool CreatureSense_Sight_Plant = true;
+        public bool CreatureSense_Smell_Creature = true;
+        public bool CreatureSense_Smell_Plant = true;
+        // ---- [--] Toggles [--] ----
 
 
         public float maxKcalEnergy = 3000; // kcal
@@ -30,6 +39,8 @@ namespace EntityConfigDomain
         public Color CreatureNeutralColor = new Color(0.5f, 0.5f, 0.5f, 1.0f); 
         public float UpdateIntervalOfCreatureBrain = 0.5f; // default 200ms
         public int SightDistanceInCells = 4;
+        public int SmellDistanceInCells = 2;
+        public int SmellLowestToSense = 4;    // default lowest smell intensity value that can be sensed
         public float MoveDuration = 1.0f; // seconds
         public float MoveSpeed = 3.0f;
         public float minDeathAge = 90;
