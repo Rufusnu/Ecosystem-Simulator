@@ -467,7 +467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MutationFactor: 0.01
-  AverageDifferenceValidator: 0.2
+  AverageDifferenceValidator: 0.1
   RejectionProbability: 0.2
   CreatureSense_Sight_Creature: 1
   CreatureSense_Sight_Plant: 1
@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7a3668cbe1ab74899caf49cd2a58cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameSpeedMultiplier: 30
+  GameSpeedMultiplier: 20
   Debugging: 0
   Debugging_EnergySystem: 0
   GridRows: 54
