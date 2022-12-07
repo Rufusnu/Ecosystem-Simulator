@@ -2,6 +2,8 @@
  
 The application is developed using Unity and is a simulation of an ecosystem structured using OOP concepts.
 
+Link to presentation: https://youtu.be/Xfp8TiXJCeU
+
 
 # Abstract
 
